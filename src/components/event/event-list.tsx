@@ -1,9 +1,13 @@
 import * as React from 'react';
-import CreateEvent from '../create-event';
+import CreateEvent from './create-event';
+//import EditEvent from './edit-event';
 import { Divider, Card, Button } from 'semantic-ui-react';
 import autobind from 'autobind-decorator';
 import swal from 'sweetalert2';
+//import withReactContent, { SweetAlert2, ReactSweetAlert, ReactSweetAlertOptions } from 'sweetalert2-react-content';
 import { firestore } from '../../firebase';
+
+//const ReactSwal = withReactContent(swal);
 
 type EventListProps = {
     loading: boolean,
@@ -18,6 +22,10 @@ class EventListComponent extends React.Component<EventListProps, {}> {
 
     @autobind
     async editEvent(event: RoomManager.Event) {
+        /*(ReactSwal as SweetAlert2 & ReactSweetAlert & {fire: (options: ReactSweetAlertOptions) => any}).fire({
+            title: `Event '${event.name}' bearbeiten`,
+            html: <EditEvent setLoading={this.props.setLoading} event={event} />
+        });*/
         const { value: name } = await swal({
             title: `Event ${event.name} bearbeiten`,
             input: 'text',
@@ -32,7 +40,7 @@ class EventListComponent extends React.Component<EventListProps, {}> {
             }
         });
 
-        this.setState({loading: true});
+        this.props.setLoading(true);
 
         if(name) {
             try {
@@ -42,10 +50,8 @@ class EventListComponent extends React.Component<EventListProps, {}> {
                 console.error('Fehler beim Updaten in Firebase', err);
                 swal('Fehler', 'Feuer! Feuer!', 'error');
             }
-        } else {
-            swal('Fehler', 'Etwas ist schief gelaufen...', 'error');
         }
-        this.setState({loading: false});
+        this.props.setLoading(false);
     }
 
     @autobind

@@ -33,7 +33,6 @@ export default class App extends React.Component<any, AppState> {
         this.cancelRoomsListener = firestore.collection('rooms').onSnapshot(snapshot => {
             const rooms: RoomManager.Room[] = [];
             snapshot.docs.forEach(room => {
-                
                 rooms.push(({...room.data(), _id: room.id} as RoomManager.Room));
             });
             this.setState({rooms, roomsLoading: false});

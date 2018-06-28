@@ -5,11 +5,11 @@ import swal from 'sweetalert2';
 
 import autobind from 'autobind-decorator';
 
-type CreateRoomType = {
+type CreateRoomState = {
     name: string
 }
 
-export default class CreateRoom extends React.Component<any, CreateRoomType> {
+export default class CreateRoom extends React.Component<any, CreateRoomState> {
     constructor(props: any) {
         super(props);
 

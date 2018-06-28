@@ -5,11 +5,11 @@ import swal from 'sweetalert2';
 
 import autobind from 'autobind-decorator';
 
-type CreateEventType = {
+type CreateEventState = {
     name: string
 }
 
-export default class CreateEvent extends React.Component<any, CreateEventType> {
+export default class CreateEvent extends React.Component<any, CreateEventState> {
     constructor(props: any) {
         super(props);
 

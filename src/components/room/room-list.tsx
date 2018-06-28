@@ -1,5 +1,5 @@
 import * as React from 'react';
-import CreateRoom from '../create-room';
+import CreateRoom from './create-room';
 import { Divider, Card, Button } from 'semantic-ui-react';
 import autobind from 'autobind-decorator';
 import swal from 'sweetalert2';
@@ -32,7 +32,7 @@ class RoomListComponent extends React.Component<RoomListProps, {}> {
             }
         });
 
-        this.setState({ roomsLoading: true });
+        this.props.setLoading(true);
 
         if (name) {
             try {
@@ -42,10 +42,8 @@ class RoomListComponent extends React.Component<RoomListProps, {}> {
                 console.error('Fehler beim Updaten in Firebase', err);
                 swal('Fehler', 'Feuer! Feuer!', 'error');
             }
-        } else {
-            swal('Fehler', 'Etwas ist schief gelaufen...', 'error');
         }
-        this.setState({ eventsLoading: false });
+        this.props.setLoading(false);
     }
 
     @autobind
