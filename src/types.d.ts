@@ -11,3 +11,4 @@ declare namespace RoomManager {
 }
 
 declare module 'react-firebaseui';
+declare module 'react-loading-bar';

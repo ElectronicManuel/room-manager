@@ -5,8 +5,6 @@ import EventListComponent from './components/event/event-list';
 import { firestore, firebase } from './firebase';
 import { Container, Header, Button, Grid } from 'semantic-ui-react';
 
-import 'semantic-ui-css/semantic.min.css';
-
 type AppState = {
     roomsLoading: boolean,
     eventsLoading: boolean,
@@ -60,7 +58,7 @@ export default class App extends React.Component<any, AppState> {
                 <Button color='red' floated='right' onClick={() => {firebase.auth().signOut()}}>Abmelden</Button>
                 </Header>
                 
-                <Grid columns={2} stackable>
+                <Grid columns={2} stackable centered>
                     <Grid.Column floated='left'>
                         <Header as='h2'>
                             Räume

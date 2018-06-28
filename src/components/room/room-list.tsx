@@ -1,6 +1,6 @@
 import * as React from 'react';
 import CreateRoom from './create-room';
-import { Divider, Card, Button } from 'semantic-ui-react';
+import { Divider, Card, Button, Grid, Loader } from 'semantic-ui-react';
 import autobind from 'autobind-decorator';
 import swal from 'sweetalert2';
 import { firestore } from '../../firebase';
@@ -54,19 +54,19 @@ class RoomListComponent extends React.Component<RoomListProps, {}> {
     render() {
         const roomList = this.props.rooms.map((room: RoomManager.Room) => {
             return (
-                <Card key={room._id}>
+                <Card key={room._id} fluid>
                     <Card.Content>
                         <Card.Header>{room.name}</Card.Header>
                     </Card.Content>
                     <Card.Content extra>
-                        <div className='ui two buttons'>
+                        <Button.Group fluid>
                             <Button basic primary onClick={() => { this.editRoom(room) }}>
                                 Bearbeiten
-                        </Button>
+                            </Button>
                             <Button basic color='red' onClick={() => { this.deleteRoom(room._id) }}>
                                 Löschen
-                        </Button>
-                        </div>
+                            </Button>
+                        </Button.Group>
                     </Card.Content>
                 </Card>
             )
@@ -76,14 +76,16 @@ class RoomListComponent extends React.Component<RoomListProps, {}> {
             <div>
                 <CreateRoom />
                 <Divider />
-                {
-                    this.props.loading ?
-                        <p>Loading</p>
-                        :
-                        <Card.Group stackable>
-                            {roomList}
-                        </Card.Group>
-                }
+                
+                <Grid centered padded>
+                    <Loader inline active={this.props.loading} indeterminate>
+                        Lade Räume
+                    </Loader>
+                </Grid>
+
+                <Card.Group stackable>
+                    {roomList}
+                </Card.Group>
             </div>
         );
     }
