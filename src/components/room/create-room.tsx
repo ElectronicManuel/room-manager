@@ -1,15 +1,15 @@
 import * as React from 'react'
-import { firestore } from '../firebase';
+import { firestore } from '../../firebase';
 import { Form } from 'semantic-ui-react';
 import swal from 'sweetalert2';
 
 import autobind from 'autobind-decorator';
 
-type CreateEventType = {
+type CreateRoomType = {
     name: string
 }
 
-export default class CreateEvent extends React.Component<any, CreateEventType> {
+export default class CreateRoom extends React.Component<any, CreateRoomType> {
     constructor(props: any) {
         super(props);
 
@@ -34,7 +34,7 @@ export default class CreateEvent extends React.Component<any, CreateEventType> {
                 name: ''
             });
     
-            firestore.collection('events').add({name});
+            firestore.collection('rooms').add({name});
         } else {
             swal('Fehler', `Der Name muss mindestens ${minLength} Zeichen haben`, 'error');
         }
@@ -45,7 +45,7 @@ export default class CreateEvent extends React.Component<any, CreateEventType> {
 
         return (
             <Form onSubmit={this.handleSubmit}>
-                <Form.Input placeholder='Name des Events' name='name' value={name} onChange={this.handleChange} />
+                <Form.Input placeholder='Name des Raumes' name='name' value={name} onChange={this.handleChange} />
                 <Form.Button content='Hinzufügen' primary fluid />
             </Form>
         );
