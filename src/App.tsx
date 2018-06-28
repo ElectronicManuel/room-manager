@@ -1,7 +1,7 @@
 import * as React from 'react'
 import CreateRoom from './components/create-room';
 import CreateEvent from './components/create-event';
-import { firestore, firebase, SignInScreen } from './firebase';
+import { firestore, firebase } from './firebase';
 import { Container, Header, Card, Divider, Loader, Button, Grid } from 'semantic-ui-react';
 import swal from 'sweetalert2';
 
@@ -130,10 +130,6 @@ export default class App extends React.Component<any, AppState> {
     public render() {
         if(this.state.userLoading) {
             return <Loader indeterminate /> 
-        }
-
-        if(!this.state.user) {
-            return <SignInScreen />
         }
 
         const roomList = this.state.rooms.map((room: RoomManager.Room) => {
