@@ -1,13 +1,20 @@
 declare namespace RoomManager {
-    interface Room {
-        name: string,
+
+    interface HasId {
         _id: string
     }
-    
-    interface Event {
-        name: string,
-        _id: string
+
+    interface RoomInCreation {
+        name: string
     }
+
+    type Room = RoomInCreation & HasId;
+
+    interface EventInCreation {
+        name: string
+    }
+
+    type Event = EventInCreation & HasId;
 }
 
 declare module 'react-firebaseui';

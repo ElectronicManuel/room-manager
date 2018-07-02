@@ -7,6 +7,9 @@ import App from './app';
 import { firebase } from './firebase';
 import { Loader, Header, Container } from 'semantic-ui-react';
 
+import 'semantic-ui-css/semantic.min.css';
+import './style.css';
+
 type RootCompState = {
     loading: boolean
 }
@@ -36,7 +39,7 @@ export default class RootComponent extends React.Component<any, RootCompState> {
             <Router>
                 {
                     this.state.loading ?
-                        <Loader indeterminate />
+                        <Loader indeterminate active={this.state.loading}>Lade Website</Loader>
                         :
                         <Container>
                             <Header as='h1'>Room-Manager</Header>
