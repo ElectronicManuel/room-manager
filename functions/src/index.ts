@@ -1,6 +1,8 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
+admin.initializeApp();
+
 const firestore = admin.firestore();
 
 import { cleanAfterUser, listUsers } from './users';
@@ -17,7 +19,7 @@ export const handleUserRemoval = functions.auth.user().onDelete(user => {
     return cleanAfterUser(uid);
 });
 
-export const setUnsetRoles = functions.https.onRequest(async (req, res) => {
+const setUnsetRoles = functions.https.onRequest(async (req, res) => {
     const users = await listUsers();
     const fixedUsers = [];
 
@@ -32,9 +34,4 @@ export const setUnsetRoles = functions.https.onRequest(async (req, res) => {
     }
 
     res.status(200).send(JSON.stringify(fixedUsers));
-});
-
-export const getAllUsers = functions.https.onRequest(async (req, res) => {
-    const users = await listUsers();
-    res.status(200).json(users);
 });
