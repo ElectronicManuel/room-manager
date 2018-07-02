@@ -1,9 +1,11 @@
 import * as React from 'react';
-import CreateRoom from './create-room';
 import { Divider, Card, Button, Grid, Loader } from 'semantic-ui-react';
 import autobind from 'autobind-decorator';
 import swal from 'sweetalert2';
-import { firestore } from '../../firebase';
+import withReactContent, { SweetAlert2, ReactSweetAlert, ReactSweetAlertOptions } from 'sweetalert2-react-content';
+import EditRoom from './edit-room';
+
+const ReactSwal = withReactContent(swal);
 
 type RoomListProps = {
     loading: boolean,
@@ -17,33 +19,21 @@ class RoomListComponent extends React.Component<RoomListProps, {}> {
     }
 
     @autobind
-    async editRoom(room: RoomManager.Room) {
-        const { value: name } = await swal({
-            title: `Raum ${room.name} bearbeiten`,
-            input: 'text',
-            inputPlaceholder: 'Name des Raumes',
-            showCancelButton: true,
-            inputValue: room.name,
-            inputValidator: (value: string): any => {
-                if (!value || value.length < 2) {
-                    return 'Der Name muss mindestends 2 Zeichen lang sein';
-                }
-                return null;
-            }
+    async createRoom() {
+        (ReactSwal as SweetAlert2 & ReactSweetAlert & { fire: (options: ReactSweetAlertOptions) => any }).fire({
+            title: `Raum erstellen`,
+            html: <EditRoom room={{name: ''}} mode='create' />,
+            showConfirmButton: false
         });
+    }
 
-        this.props.setLoading(true);
-
-        if (name) {
-            try {
-                await firestore.collection('rooms').doc(room._id).update({ name });
-                swal('Erfolg', 'Raum bearbeitet', 'success');
-            } catch (err) {
-                console.error('Fehler beim Updaten in Firebase', err);
-                swal('Fehler', 'Feuer! Feuer!', 'error');
-            }
-        }
-        this.props.setLoading(false);
+    @autobind
+    async editRoom(room: RoomManager.Room) {
+        (ReactSwal as SweetAlert2 & ReactSweetAlert & { fire: (options: ReactSweetAlertOptions) => any }).fire({
+            title: `Raum bearbeiten`,
+            html: <EditRoom room={room} mode='edit' />,
+            showConfirmButton: false
+        });
     }
 
     @autobind
@@ -74,7 +64,7 @@ class RoomListComponent extends React.Component<RoomListProps, {}> {
 
         return (
             <div>
-                <CreateRoom />
+                <Button onClick={() => {this.createRoom()}} fluid primary>Neuer Raum</Button>
                 <Divider />
                 
                 <Grid centered padded>

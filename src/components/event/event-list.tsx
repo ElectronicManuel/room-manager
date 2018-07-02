@@ -1,5 +1,4 @@
 import * as React from 'react';
-import CreateEvent from './create-event';
 import EditEvent from './edit-event';
 import { Divider, Card, Button, Loader, Grid } from 'semantic-ui-react';
 import autobind from 'autobind-decorator';
@@ -20,38 +19,21 @@ class EventListComponent extends React.Component<EventListProps, {}> {
     }
 
     @autobind
+    async createEvent() {
+        (ReactSwal as SweetAlert2 & ReactSweetAlert & { fire: (options: ReactSweetAlertOptions) => any }).fire({
+            title: `Event erstellen`,
+            html: <EditEvent event={{name: ''}} mode='create' />,
+            showConfirmButton: false
+        });
+    }
+
+    @autobind
     async editEvent(event: RoomManager.Event) {
         (ReactSwal as SweetAlert2 & ReactSweetAlert & { fire: (options: ReactSweetAlertOptions) => any }).fire({
             title: `Event '${event.name}' bearbeiten`,
             html: <EditEvent event={event} mode='edit' />,
             showConfirmButton: false
         });
-        /*const { value: name } = await swal({
-            title: `Event ${event.name} bearbeiten`,
-            input: 'text',
-            inputPlaceholder: 'Name des Events',
-            showCancelButton: true,
-            inputValue: event.name,
-            inputValidator: (value: string): any => {
-                if(!value || value.length < 2) {
-                    return 'Der Name muss mindestends 2 Zeichen lang sein';
-                }
-                return null;
-            }
-        });
-
-        this.props.setLoading(true);
-
-        if(name) {
-            try {
-                await firestore.collection('events').doc(event._id).update({name});
-                swal('Erfolg', 'Event bearbeitet', 'success');
-            } catch(err) {
-                console.error('Fehler beim Updaten in Firebase', err);
-                swal('Fehler', 'Feuer! Feuer!', 'error');
-            }
-        }
-        this.props.setLoading(false);*/
     }
 
     @autobind
@@ -82,7 +64,7 @@ class EventListComponent extends React.Component<EventListProps, {}> {
 
         return (
             <div>
-                <CreateEvent />
+                <Button onClick={() => {this.createEvent()}} fluid primary>Neues Event</Button>
                 <Divider />
                 <Grid centered padded>
                     <Loader inline active={this.props.loading} indeterminate>

@@ -8,7 +8,6 @@ import { firebase } from './firebase';
 import { Loader, Header, Container } from 'semantic-ui-react';
 
 import 'semantic-ui-css/semantic.min.css';
-import 'react-loading-bar/dist/index.css';
 import './style.css';
 
 type RootCompState = {
