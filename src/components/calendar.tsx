@@ -23,6 +23,36 @@ class RoomCalendar extends React.Component<any, any> {
                             start: '07.01.2018',
                             end: '07.07.2018',
                             color: 'red'
+                        },
+                        {
+                            title: 'Second thing',
+                            start: '07.01.2018',
+                            end: '07.07.2018',
+                            color: 'red'
+                        },
+                        {
+                            title: 'Second thing',
+                            start: '07.01.2018',
+                            end: '07.07.2018',
+                            color: 'red'
+                        },
+                        {
+                            title: 'Second thing',
+                            start: '07.01.2018',
+                            end: '07.07.2018',
+                            color: 'red'
+                        },
+                        {
+                            title: 'Second thing',
+                            start: '07.01.2018',
+                            end: '07.07.2018',
+                            color: 'red'
+                        },
+                        {
+                            title: 'Second thing',
+                            start: '07.01.2018',
+                            end: '07.07.2018',
+                            color: 'red'
                         }
                     ]}
                     startAccessor={(event: any) => {
@@ -36,6 +66,10 @@ class RoomCalendar extends React.Component<any, any> {
                     }}
                     allDayAccessor={(event) => {return true}}
                     eventPropGetter={(event: any) => {return {style: {backgroundColor: event.color}}}}
+                    popup={true}
+                    onSelectEvent={(event: any) => {
+                        alert(event.title);
+                    }}
                     views={['month', 'week']}
                     messages={{
                         allDay: 'Ganzer Tag',
@@ -49,7 +83,7 @@ class RoomCalendar extends React.Component<any, any> {
                         date: 'Datum',
                         time: 'Zeit',
                         event: 'Event',
-                        showMore: (input) => `${JSON.stringify(input)} - mehr`
+                        showMore: (input) => `Zeige ${JSON.stringify(input)} mehr`
                       }}
                 />
             </div>
