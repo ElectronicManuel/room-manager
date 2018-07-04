@@ -1,16 +1,19 @@
 import * as React from 'react';
 import EditEvent from './edit-event';
-import { Divider, Card, Button, Loader, Grid } from 'semantic-ui-react';
+import { Divider, Button, Loader, Grid } from 'semantic-ui-react';
 import autobind from 'autobind-decorator';
 import swal from 'sweetalert2';
 import withReactContent, { SweetAlert2, ReactSweetAlert, ReactSweetAlertOptions } from 'sweetalert2-react-content';
 import {firestore} from '../../firebase';
+
+import Calendar from './calendar';
 
 const ReactSwal = withReactContent(swal);
 
 type EventListProps = {
     loading: boolean,
     events: RoomManager.Event[],
+    rooms: RoomManager.Room[],
     setLoading: (loading: boolean) => void
 }
 
@@ -23,7 +26,7 @@ class EventListComponent extends React.Component<EventListProps, {}> {
     async createEvent() {
         (ReactSwal as SweetAlert2 & ReactSweetAlert & { fire: (options: ReactSweetAlertOptions) => any }).fire({
             title: `Event erstellen`,
-            html: <EditEvent event={{name: ''}} mode='create' />,
+            html: <EditEvent event={{name: '', roomId: ''}} mode='create' deleteEvent={() => {}} rooms={this.props.rooms} />,
             showConfirmButton: false
         });
     }
@@ -32,7 +35,7 @@ class EventListComponent extends React.Component<EventListProps, {}> {
     async editEvent(event: RoomManager.Event) {
         (ReactSwal as SweetAlert2 & ReactSweetAlert & { fire: (options: ReactSweetAlertOptions) => any }).fire({
             title: `Event '${event.name}' bearbeiten`,
-            html: <EditEvent event={event} mode='edit' />,
+            html: <EditEvent event={event} mode='edit' deleteEvent={() => {this.deleteEvent(event)}} rooms={this.props.rooms} />,
             showConfirmButton: false
         });
     }
@@ -67,26 +70,6 @@ class EventListComponent extends React.Component<EventListProps, {}> {
     }
 
     render() {
-        const eventList = this.props.events.map((event) => {
-            return (
-                <Card key={event._id} fluid>
-                    <Card.Content>
-                        <Card.Header>{event.name}</Card.Header>
-                    </Card.Content>
-                    <Card.Content extra>
-                        <Button.Group fluid>
-                            <Button basic primary onClick={() => { this.editEvent(event) }}>
-                                Bearbeiten
-                            </Button>
-                            <Button basic color='red' onClick={() => { this.deleteEvent(event) }}>
-                                Löschen
-                            </Button>
-                        </Button.Group>
-                    </Card.Content>
-                </Card>
-            )
-        });
-
         return (
             <div>
                 <Button onClick={() => {this.createEvent()}} fluid primary>Neues Event</Button>
@@ -96,9 +79,9 @@ class EventListComponent extends React.Component<EventListProps, {}> {
                         Lade Events
                     </Loader>
                 </Grid>
-                <Card.Group stackable>
-                    {eventList}
-                </Card.Group>
+                {
+                    !this.props.loading ? <Calendar events={this.props.events} editEvent={this.editEvent} deleteEvent={this.deleteEvent} rooms={this.props.rooms} /> : null
+                }
             </div>
         );
     }
