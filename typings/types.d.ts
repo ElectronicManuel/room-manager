@@ -13,9 +13,6 @@ declare namespace RoomManager {
 
     interface EventInCreation {
         name: string
-        startDate: Date,
-        endDate: Date,
-        roomFk: string
     }
 
     type Event = EventInCreation & HasId;
