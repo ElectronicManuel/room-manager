@@ -54,6 +54,7 @@ export default class App extends React.Component<any, AppState> {
     public render() {
         return (
             <Container>
+                <Calendar />
                 <Header as='h2'>
                 Übersicht
                 <Button color='red' floated='right' onClick={() => {firebase.auth().signOut()}}>Abmelden</Button>
@@ -73,7 +74,6 @@ export default class App extends React.Component<any, AppState> {
                         <EventListComponent loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} />
                     </Grid.Column>
                 </Grid>
-                <Calendar />
             </Container>
             
         )
