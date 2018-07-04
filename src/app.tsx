@@ -1,6 +1,7 @@
 import * as React from 'react'
 import RoomListComponent from './components/room/room-list';
 import EventListComponent from './components/event/event-list';
+import Calendar from './components/calendar';
 
 import { firestore, firebase } from './firebase';
 import { Container, Header, Button, Grid } from 'semantic-ui-react';
@@ -72,6 +73,7 @@ export default class App extends React.Component<any, AppState> {
                         <EventListComponent loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} />
                     </Grid.Column>
                 </Grid>
+                <Calendar />
             </Container>
             
         )
