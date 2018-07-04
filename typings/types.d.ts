@@ -15,6 +15,10 @@ declare namespace RoomManager {
     }
 
     type Event = EventInCreation & HasId;
+
+    interface User {
+        role: 'admin' | 'user'
+    }
 }
 
 declare module 'react-firebaseui';

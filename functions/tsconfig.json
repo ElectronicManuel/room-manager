@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "lib": [
+            "es6"
+        ],
+        "module": "commonjs",
+        "noImplicitReturns": true,
+        "outDir": "lib",
+        "sourceMap": true,
+        "target": "es6",
+        "rootDir": "src",
+        "typeRoots": [
+            "../typings"
+        ]
+    },
+    "compileOnSave": true,
+    "exclude": [
+        "../node_modules/*"
+    ]
+}
