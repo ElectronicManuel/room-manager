@@ -4,6 +4,7 @@ import autobind from 'autobind-decorator';
 import swal from 'sweetalert2';
 import withReactContent, { SweetAlert2, ReactSweetAlert, ReactSweetAlertOptions } from 'sweetalert2-react-content';
 import EditRoom from './edit-room';
+import {firestore} from '../../firebase';
 
 const ReactSwal = withReactContent(swal);
 
@@ -37,8 +38,32 @@ class RoomListComponent extends React.Component<RoomListProps, {}> {
     }
 
     @autobind
-    deleteRoom(roomId: string) {
-        swal('Noch nicht implementiert');
+    async deleteRoom(room: RoomManager.Room) {
+        const result = await swal({
+            title: `Möchtest du wirklich den Raum ${room.name} löschen?`,
+            text: "Es kann nicht rückgängig gemacht werden!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ja, löschen!'
+          });
+          
+        if (result.value) {
+            try
+            {
+            await firestore.collection('rooms').doc(room._id).delete();
+            swal(
+                'Gelöscht!',
+                'Der Raum wurde erfolgreich gelöscht.',
+                'success'
+                )
+            }
+            catch(err){
+                console.error('Fehler beim Löschen', err);
+                swal(
+                    'Fehler beim Löschen des Raums'
+                )
+            }           
+        }
     }
 
     render() {
@@ -53,7 +78,7 @@ class RoomListComponent extends React.Component<RoomListProps, {}> {
                             <Button basic primary onClick={() => { this.editRoom(room) }}>
                                 Bearbeiten
                             </Button>
-                            <Button basic color='red' onClick={() => { this.deleteRoom(room._id) }}>
+                            <Button basic color='red' onClick={() => { this.deleteRoom(room) }}>
                                 Löschen
                             </Button>
                         </Button.Group>
