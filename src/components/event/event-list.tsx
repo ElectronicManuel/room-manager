@@ -4,6 +4,7 @@ import { Divider, Card, Button, Loader, Grid } from 'semantic-ui-react';
 import autobind from 'autobind-decorator';
 import swal from 'sweetalert2';
 import withReactContent, { SweetAlert2, ReactSweetAlert, ReactSweetAlertOptions } from 'sweetalert2-react-content';
+import {firestore} from '../../firebase';
 
 const ReactSwal = withReactContent(swal);
 
@@ -37,8 +38,32 @@ class EventListComponent extends React.Component<EventListProps, {}> {
     }
 
     @autobind
-    deleteEvent(eventId: string) {
-        swal('Noch nicht implementiert');
+    async deleteEvent(event: RoomManager.Event) {
+        const result = await swal({
+            title: `Möchtest du wirklich das Event ${event.name} löschen?`,
+            text: "Es kann nicht rückgängig gemacht werden!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ja, löschen!'
+          });
+          
+        if (result.value) {
+            try
+            {
+            await firestore.collection('events').doc(event._id).delete();
+            swal(
+                'Gelöscht!',
+                'Das Event wurde erfolgreich gelöscht.',
+                'success'
+                )
+            }
+            catch(err){
+                console.error('Fehler beim Löschen', err);
+                swal(
+                    'Fehler beim Löschen des Events'
+                )
+            }           
+        }
     }
 
     render() {
@@ -53,7 +78,7 @@ class EventListComponent extends React.Component<EventListProps, {}> {
                             <Button basic primary onClick={() => { this.editEvent(event) }}>
                                 Bearbeiten
                             </Button>
-                            <Button basic color='red' onClick={() => { this.deleteEvent(event._id) }}>
+                            <Button basic color='red' onClick={() => { this.deleteEvent(event) }}>
                                 Löschen
                             </Button>
                         </Button.Group>
