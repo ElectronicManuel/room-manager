@@ -110,7 +110,7 @@ export default class EditRoomComp extends React.Component<EditRoomProps, any> {
                     <SemanticForm onSubmit={formikBag.handleSubmit} loading={formikBag.isSubmitting}>
                         <SemanticForm.Input label='Name' placeholder='Name des Raumes' name='name' value={formikBag.values.name} onChange={formikBag.handleChange} error={formikBag.errors.name != null} />
                         {formikBag.errors.name ? <Label pointing color='red'>{formikBag.errors.name}</Label> : null }
-                        <SemanticForm.Input label='Beschreibung' placeholder='Beschreibung des Raumes' name='description' value={formikBag.values.description} onChange={formikBag.handleChange} error={formikBag.errors.description != null} />
+                        <SemanticForm.TextArea label='Beschreibung' placeholder='Beschreibung des Raumes' name='description' value={formikBag.values.description} onChange={formikBag.handleChange} error={formikBag.errors.description != null} />
                         {formikBag.errors.description ? <Label pointing color='red'>{formikBag.errors.description}</Label> : null }
                         <SemanticForm.Dropdown label='Farbe' selection value={formikBag.values.color} onChange={ (e, {value}) => {formikBag.setFieldValue('color', value)}} placeholder="Farbe" options={colors} error={formikBag.errors.color != null}></SemanticForm.Dropdown>
                         {formikBag.errors.color ? <Label pointing color='red'>{formikBag.errors.color}</Label> : null }
