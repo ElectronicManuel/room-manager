@@ -66,10 +66,14 @@ export default class App extends React.Component<AppProps, AppState> {
                 </Header>
                 <EventListComponent loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} />
 
-                <Header as='h2'>
-                    Räume
-                </Header>
-                <RoomListComponent loading={this.state.roomsLoading} rooms={this.state.rooms} setLoading={(loading: boolean) => {this.setState({roomsLoading: loading})}} />
+                {this.props.userDetails.role == 'Verwaltung' ? 
+                    <div>
+                        <Header as='h2'>
+                            Räume
+                        </Header>
+                        <RoomListComponent loading={this.state.roomsLoading} rooms={this.state.rooms} setLoading={(loading: boolean) => {this.setState({roomsLoading: loading})}} />
+                    </div>
+                : null}
             </Container>
             
         )
