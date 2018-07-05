@@ -14,7 +14,8 @@ type EventListProps = {
     loading: boolean,
     events: RoomManager.Event[],
     rooms: RoomManager.Room[],
-    setLoading: (loading: boolean) => void
+    setLoading: (loading: boolean) => void,
+    userDetails: RoomManager.User
 }
 
 class EventListComponent extends React.Component<EventListProps, {}> {
@@ -26,7 +27,7 @@ class EventListComponent extends React.Component<EventListProps, {}> {
     async createEvent() {
         (ReactSwal as SweetAlert2 & ReactSweetAlert & { fire: (options: ReactSweetAlertOptions) => any }).fire({
             title: `Event erstellen`,
-            html: <EditEvent event={{name: '', roomId: '', startDate: undefined, endDate: undefined}} mode='create' deleteEvent={() => {}} rooms={this.props.rooms} />,
+            html: <EditEvent event={{name: '', roomId: '', startDate: undefined, endDate: undefined}} mode='create' deleteEvent={() => {}} rooms={this.props.rooms} userDetails={this.props.userDetails} />,
             showConfirmButton: false
         });
     }
@@ -35,7 +36,7 @@ class EventListComponent extends React.Component<EventListProps, {}> {
     async editEvent(event: RoomManager.Event) {
         (ReactSwal as SweetAlert2 & ReactSweetAlert & { fire: (options: ReactSweetAlertOptions) => any }).fire({
             title: `Event '${event.name}' bearbeiten`,
-            html: <EditEvent event={event} mode='edit' deleteEvent={() => {this.deleteEvent(event)}} rooms={this.props.rooms} />,
+            html: <EditEvent event={event} mode='edit' deleteEvent={() => {this.deleteEvent(event)}} rooms={this.props.rooms} userDetails={this.props.userDetails} />,
             showConfirmButton: false
         });
     }
@@ -72,7 +73,12 @@ class EventListComponent extends React.Component<EventListProps, {}> {
     render() {
         return (
             <div>
-                <Button onClick={() => {this.createEvent()}} fluid primary>Neues Event</Button>
+                {
+                    this.props.userDetails.role != 'Hauswart' ?
+                        <Button onClick={() => {this.createEvent()}} fluid primary>Neues Event</Button>
+                        :
+                        null
+                }
                 <Divider />
                 <Grid centered padded>
                     <Loader inline active={this.props.loading} indeterminate>

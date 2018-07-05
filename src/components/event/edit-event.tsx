@@ -14,7 +14,8 @@ type EditEventProps = {
     event: RoomManager.Event | RoomManager.EventInCreation,
     mode: 'create' | 'edit',
     deleteEvent: () => void,
-    rooms: RoomManager.Room[]
+    rooms: RoomManager.Room[],
+    userDetails: RoomManager.User
 }
 
 type EditEventState = {
@@ -38,6 +39,11 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
         if(this.startRef) {
             this.startRef.focus();
         }
+    }
+
+    @autobind
+    canEdit() {
+        return this.props.userDetails.role != 'Hauswart';
     }
 
     @autobind
@@ -119,44 +125,52 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                 }}
                 render={(formikBag: FormikProps<EditEvent>) => (
                     <SemanticForm onSubmit={formikBag.handleSubmit} loading={formikBag.isSubmitting}>
-                        <SemanticForm.Input label='Name' error={formikBag.errors.name != null} placeholder='Name des Events' name='name' value={formikBag.values.name} onChange={formikBag.handleChange} />
+                        <SemanticForm.Input disabled={!this.canEdit()} label='Name' error={formikBag.errors.name != null} placeholder='Name des Events' name='name' value={formikBag.values.name} onChange={formikBag.handleChange} />
                         {formikBag.errors.name ? <Label pointing color='red'>{formikBag.errors.name}</Label> : null }
-                        <SemanticForm.Dropdown label='Raum' selection value={formikBag.values.roomId} onChange={ (e, {value}) => {formikBag.setFieldValue('roomId', value)}} placeholder="Raum" options={this.getRoomOptions()} error={formikBag.errors.roomId != null}></SemanticForm.Dropdown>
+                        <SemanticForm.Dropdown disabled={!this.canEdit()} label='Raum' selection value={formikBag.values.roomId} onChange={ (e, {value}) => {formikBag.setFieldValue('roomId', value)}} placeholder="Raum" options={this.getRoomOptions()} error={formikBag.errors.roomId != null}></SemanticForm.Dropdown>
                         {formikBag.errors.roomId ? <Label pointing color='red'>{formikBag.errors.roomId}</Label> : null }
                         <SemanticForm.Group>
-                            <SemanticForm.Field error={formikBag.errors.startDate != null}>
+                            <SemanticForm.Field disabled={!this.canEdit()} error={formikBag.errors.startDate != null}>
                                 <label>Start Datum</label>
                                 <input readOnly ref={ref => this.startRef = ref} onFocus={() => {this.setState({dateInputFocus: 'startDate'})}} placeholder='Start Datum' value={formikBag.values.startDate ? moment.unix(formikBag.values.startDate).format('DD.MM.YYYY') : 'Nicht definiert'} />
                                 {formikBag.errors.startDate ? <Label pointing color='red'>{formikBag.errors.startDate}</Label> : null }
                             </SemanticForm.Field>
-                            <SemanticForm.Field error={formikBag.errors.endDate != null}>
+                            <SemanticForm.Field disabled={!this.canEdit()} error={formikBag.errors.endDate != null}>
                                 <label>End Datum</label>
                                 <input readOnly ref={ref => this.endRef = ref} onFocus={() => {this.setState({dateInputFocus: 'endDate'})}} placeholder='End Datum' value={formikBag.values.endDate ? moment.unix(formikBag.values.endDate).format('DD.MM.YYYY') : 'Nicht definiert'} />
                                 {formikBag.errors.endDate ? <Label pointing color='red'>{formikBag.errors.endDate}</Label> : null }
                             </SemanticForm.Field>
                         </SemanticForm.Group>
-                        <div>
-                            <DayPickerRangeController
-                                startDate={formikBag.values.startDate ? moment.unix(formikBag.values.startDate) : null}
-                                endDate={formikBag.values.endDate ? moment.unix(formikBag.values.endDate) : null}
-                                onDatesChange={({ startDate, endDate }) => {
-                                    formikBag.setFieldValue('startDate', startDate ? startDate.unix() : undefined);
-                                    formikBag.setFieldValue('endDate', endDate ? endDate.unix() : null);
-                                }}
-                                focusedInput={this.state.dateInputFocus}
-                                onFocusChange={this.handleFocusChange}
-                                isOutsideRange={(date) => {return false}}
-                                orientation='horizontal'
-                                hideKeyboardShortcutsPanel
-                            />
-                        </div>
-                        <Divider />
-                        <SemanticForm.Button content={this.props.mode == 'edit' ? 'Bearbeiten' : 'Erstellen'} primary fluid disabled={!formikBag.isValid || formikBag.isSubmitting} loading={formikBag.isSubmitting} />
-                        <SemanticForm.Button content='Abbrechen' color='red' fluid onClick={(e) => {e.preventDefault();swal.close()}} />
-                        {this.props.mode == 'edit' ? 
+                        {
+                            this.canEdit() ?
                             <div>
+                                <div>
+                                    <DayPickerRangeController
+                                        startDate={formikBag.values.startDate ? moment.unix(formikBag.values.startDate) : null}
+                                        endDate={formikBag.values.endDate ? moment.unix(formikBag.values.endDate) : null}
+                                        onDatesChange={({ startDate, endDate }) => {
+                                            formikBag.setFieldValue('startDate', startDate ? startDate.unix() : undefined);
+                                            formikBag.setFieldValue('endDate', endDate ? endDate.unix() : null);
+                                        }}
+                                        focusedInput={this.state.dateInputFocus}
+                                        onFocusChange={this.handleFocusChange}
+                                        isOutsideRange={(date) => {return false}}
+                                        orientation='horizontal'
+                                        hideKeyboardShortcutsPanel
+                                        isDayBlocked={() => !this.canEdit()}
+                                    />
+                                </div>
                                 <Divider />
-                                <SemanticForm.Button content='Löschen' color='red' basic fluid onClick={(e) => {e.preventDefault();this.props.deleteEvent()}} icon={'delete'} />
+                                <SemanticForm.Button content={this.props.mode == 'edit' ? 'Bearbeiten' : 'Erstellen'} primary fluid disabled={!formikBag.isValid || formikBag.isSubmitting} loading={formikBag.isSubmitting} />
+                                <SemanticForm.Button content='Abbrechen' color='red' fluid onClick={(e) => {e.preventDefault();swal.close()}} />
+                                {this.props.mode == 'edit' ? 
+                                    <div>
+                                        <Divider />
+                                        <SemanticForm.Button content='Löschen' color='red' basic fluid onClick={(e) => {e.preventDefault();this.props.deleteEvent()}} icon={'delete'} />
+                                    </div>
+                                    :
+                                    null
+                                }
                             </div>
                             :
                             null

@@ -64,7 +64,7 @@ export default class App extends React.Component<AppProps, AppState> {
                 <Header as='h2'>
                     Events
                 </Header>
-                <EventListComponent loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} />
+                <EventListComponent loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} userDetails={this.props.userDetails} />
 
                 {this.props.userDetails.role == 'Verwaltung' ? 
                     <div>
