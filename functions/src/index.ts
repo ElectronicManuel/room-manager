@@ -3,15 +3,12 @@ import * as admin from 'firebase-admin';
 
 admin.initializeApp();
 
-const firestore = admin.firestore();
+admin.firestore();
 
-import { cleanAfterUser, listUsers } from './users';
+import { cleanAfterUser, listUsers, setupUserInFirestore, initUnsetUser } from './users';
 
 export const setupUser = functions.auth.user().onCreate(user => {
-    const { uid } = user;
-    return firestore.doc(`users/${uid}`).set({
-        role: 'user'
-    });
+    return setupUserInFirestore(user);
 });
 
 export const handleUserRemoval = functions.auth.user().onDelete(user => {
@@ -19,16 +16,13 @@ export const handleUserRemoval = functions.auth.user().onDelete(user => {
     return cleanAfterUser(uid);
 });
 
-const setUnsetRoles = functions.https.onRequest(async (req, res) => {
+export const setUnsetUserData = functions.https.onRequest(async (req, res) => {
     const users = await listUsers();
     const fixedUsers = [];
 
     for(const user of users) {
-        const userRef = firestore.doc(`users/${user.uid}`);
-        const doc = await userRef.get();
-        if(!doc.exists) {
-            const defaultUser: RoomManager.User = {role: 'user'};
-            userRef.set(defaultUser);
+        const neededFix = initUnsetUser(user);
+        if(neededFix) {
             fixedUsers.push(user.email);
         }
     }

@@ -6,7 +6,7 @@ declare namespace RoomManager {
 
     interface RoomInCreation {
         name: string,
-        color: 'red' | 'blue' | 'green' | 'orange' | 'violet' | 'black'
+        color: string
     }
 
     type Room = RoomInCreation & HasId & {
@@ -23,8 +23,11 @@ declare namespace RoomManager {
 
     type Event = EventInCreation & HasId;
 
+    type Role = 'User' | 'Verwaltung' | 'Hauswart';
+
     interface User {
-        role: 'admin' | 'user'
+        role: Role,
+        displayName: string
     }
 }
 

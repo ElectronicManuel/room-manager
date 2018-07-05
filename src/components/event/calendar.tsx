@@ -50,7 +50,7 @@ class EventCalendar extends React.Component<CalendarProps, any> {
                     onSelectEvent={(event: RoomManager.Event) => {
                         this.props.editEvent(event);
                     }}
-                    views={['month', 'week']}
+                    views={['month', 'week', 'agenda']}
                     messages={{
                         allDay: 'Ganzer Tag',
                         previous: '<',

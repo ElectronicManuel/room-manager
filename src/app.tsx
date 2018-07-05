@@ -2,8 +2,12 @@ import * as React from 'react'
 import RoomListComponent from './components/room/room-list';
 import EventListComponent from './components/event/event-list';
 
-import { firestore, firebase } from './firebase';
-import { Container, Header, Button } from 'semantic-ui-react';
+import { firestore } from './firebase';
+import { Container, Header } from 'semantic-ui-react';
+
+type AppProps = {
+    userDetails: RoomManager.User
+}
 
 type AppState = {
     roomsLoading: boolean,
@@ -12,7 +16,7 @@ type AppState = {
     events: RoomManager.Event[]
 }
 
-export default class App extends React.Component<any, AppState> {
+export default class App extends React.Component<AppProps, AppState> {
     cancelRoomsListener: Function
     cancelEventsListener: Function
 
@@ -55,7 +59,6 @@ export default class App extends React.Component<any, AppState> {
             <Container>
                 <Header as='h2'>
                 Übersicht
-                <Button color='red' floated='right' onClick={() => {firebase.auth().signOut()}}>Abmelden</Button>
                 </Header>
                 
                 <Header as='h2'>

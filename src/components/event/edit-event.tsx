@@ -22,11 +22,31 @@ type EditEventState = {
 }
 
 export default class EditEventComp extends React.Component<EditEventProps, EditEventState> {
+
+    startRef: HTMLElement | null
+    endRef: HTMLElement | null
+
     constructor(props: EditEventProps) {
         super(props);
 
         this.state = {
             dateInputFocus: 'startDate'
+        }
+    }
+
+    componentDidMount() {
+        if(this.startRef) {
+            this.startRef.focus();
+        }
+    }
+
+    @autobind
+    handleFocusChange(dateInputFocus: FocusedInputShape) {
+        this.setState({dateInputFocus: dateInputFocus});
+        if(dateInputFocus == 'startDate') {
+            if(this.startRef) this.startRef.focus();
+        } else if(dateInputFocus == 'endDate') {
+            if(this.endRef) this.endRef.focus();
         }
     }
 
@@ -39,7 +59,10 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
     getRoomOptions() {
         const optionsArray: DropdownItemProps[] = [];
         for(const room of this.props.rooms) {
-            optionsArray.push({text: room.name, value: room._id})
+            optionsArray.push({
+                text: <div style={{color: room.color}}>{room.name}</div>,
+                value: room._id
+            })
         }
 
         return optionsArray;
@@ -72,7 +95,7 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                     actions.setSubmitting(false);
                 }}
                 validate={(values) => {
-                    const { name, roomId } = values;
+                    const { name, roomId, startDate, endDate } = values;
                     let errors: FormikErrors<EditEvent> = {};
                     if(name.length < 2) {
                         errors.name = 'Der Name muss mindestends 2 Zeichen lang sein'
@@ -80,15 +103,38 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                     if(!roomId || roomId.length < 5) {
                         errors.roomId = 'Bitte wähle einen Raum';
                     }
+                    if(!startDate) {
+                        errors.startDate = 'Bitte wähle ein Start Datum'
+                    }
+                    if(!endDate) {
+                        errors.endDate = 'Bitte wähle ein End Datum';
+                    }
+                    if(startDate && endDate) {
+                        if(startDate >= endDate) {
+                            errors.endDate = 'Das End Datum muss nach dem Start Datum liegen';
+                        }
+                    }
 
                     return errors;
                 }}
                 render={(formikBag: FormikProps<EditEvent>) => (
                     <SemanticForm onSubmit={formikBag.handleSubmit} loading={formikBag.isSubmitting}>
-                        <SemanticForm.Input error={formikBag.errors.name != null} placeholder='Name des Events' name='name' value={formikBag.values.name} onChange={formikBag.handleChange} />
+                        <SemanticForm.Input label='Name' error={formikBag.errors.name != null} placeholder='Name des Events' name='name' value={formikBag.values.name} onChange={formikBag.handleChange} />
                         {formikBag.errors.name ? <Label pointing color='red'>{formikBag.errors.name}</Label> : null }
-                        <SemanticForm.Dropdown selection value={formikBag.values.roomId} onChange={ (e, {value}) => {formikBag.setFieldValue('roomId', value)}} placeholder="Raum" options={this.getRoomOptions()} error={formikBag.errors.roomId != null}></SemanticForm.Dropdown>
+                        <SemanticForm.Dropdown label='Raum' selection value={formikBag.values.roomId} onChange={ (e, {value}) => {formikBag.setFieldValue('roomId', value)}} placeholder="Raum" options={this.getRoomOptions()} error={formikBag.errors.roomId != null}></SemanticForm.Dropdown>
                         {formikBag.errors.roomId ? <Label pointing color='red'>{formikBag.errors.roomId}</Label> : null }
+                        <SemanticForm.Group>
+                            <SemanticForm.Field error={formikBag.errors.startDate != null}>
+                                <label>Start Datum</label>
+                                <input readOnly ref={ref => this.startRef = ref} onFocus={() => {this.setState({dateInputFocus: 'startDate'})}} placeholder='Start Datum' value={formikBag.values.startDate ? moment.unix(formikBag.values.startDate).format('DD.MM.YYYY') : 'Nicht definiert'} />
+                                {formikBag.errors.startDate ? <Label pointing color='red'>{formikBag.errors.startDate}</Label> : null }
+                            </SemanticForm.Field>
+                            <SemanticForm.Field error={formikBag.errors.endDate != null}>
+                                <label>End Datum</label>
+                                <input readOnly ref={ref => this.endRef = ref} onFocus={() => {this.setState({dateInputFocus: 'endDate'})}} placeholder='End Datum' value={formikBag.values.endDate ? moment.unix(formikBag.values.endDate).format('DD.MM.YYYY') : 'Nicht definiert'} />
+                                {formikBag.errors.endDate ? <Label pointing color='red'>{formikBag.errors.endDate}</Label> : null }
+                            </SemanticForm.Field>
+                        </SemanticForm.Group>
                         <div>
                             <DayPickerRangeController
                                 startDate={formikBag.values.startDate ? moment.unix(formikBag.values.startDate) : null}
@@ -98,7 +144,7 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                                     formikBag.setFieldValue('endDate', endDate ? endDate.unix() : null);
                                 }}
                                 focusedInput={this.state.dateInputFocus}
-                                onFocusChange={focusedInput => this.setState({dateInputFocus: (focusedInput as FocusedInputShape)})}
+                                onFocusChange={this.handleFocusChange}
                                 isOutsideRange={(date) => {return false}}
                                 orientation='horizontal'
                                 hideKeyboardShortcutsPanel

@@ -12,28 +12,58 @@ type EditRoomProps = {
     mode: 'create' | 'edit'
 }
 
-const colors = [
+type ColorDefinition = {
+    name: string,
+    colorValue: string
+}
+
+const colorDefinition: ColorDefinition[] = [
     {
-        text: 'red',
-        value: 'red',
+        name: 'Echtes Blau',
+        colorValue: '#97DBED'
     },
     {
-        text: 'green',
-        value: 'green',
+        name: 'Parakeet Grün',
+        colorValue: '#7AB55C'
     },
     {
-        text: 'violet',
-        value: 'violet',
+        name: 'Pink',
+        colorValue: '#FAC8BF'
     },
     {
-        text: 'blue',
-        value: 'blue',
+        name: 'Coral orange',
+        colorValue: '#FF7F50'
     },
     {
-        text: 'orange',
-        value: 'orange',
+        name: 'Plumet',
+        colorValue: '#Dda0dd'
     },
+    {
+        name: 'Dimgrau',
+        colorValue: '#696969'
+    },
+    {
+        name: 'Hellgrau',
+        colorValue: '#3C7A89'
+    },
+    {
+        name: 'Dunkelblau',
+        colorValue: '#150578'
+    }
 ]
+
+const colors = ((colorDefinitions: ColorDefinition[]) => {
+    const colorArray: any[] = [];
+    
+    for(const c of colorDefinitions) {
+        colorArray.push({
+            text: <div style={{color: c.colorValue}}>{c.name}</div>,
+            value: c.colorValue
+        });
+    }
+
+    return colorArray;
+})(colorDefinition)
 
 
 export default class EditRoomComp extends React.Component<EditRoomProps, any> {
@@ -68,16 +98,16 @@ export default class EditRoomComp extends React.Component<EditRoomProps, any> {
                     if(name.length < 2) {
                         errors.name = 'Der Name muss mindestends 2 Zeichen lang sein'
                     }
-                    if(!color || ['red', 'blue', 'green', 'violet', 'orange'].indexOf(color) <= -1) {
+                    if(!color) {
                         errors.color = 'Du musst eine Farbe auswählen';
                     }
                     return errors;
                 }}
                 render={(formikBag: FormikProps<EditRoom>) => (
                     <SemanticForm onSubmit={formikBag.handleSubmit} loading={formikBag.isSubmitting}>
-                        <SemanticForm.Input placeholder='Name des Raumes' name='name' value={formikBag.values.name} onChange={formikBag.handleChange} error={formikBag.errors.name != null} />
+                        <SemanticForm.Input label='Name' placeholder='Name des Raumes' name='name' value={formikBag.values.name} onChange={formikBag.handleChange} error={formikBag.errors.name != null} />
                         {formikBag.errors.name ? <Label pointing color='red'>{formikBag.errors.name}</Label> : null }
-                        <SemanticForm.Dropdown selection value={formikBag.values.color} onChange={ (e, {value}) => {formikBag.setFieldValue('color', value)}} placeholder="Farbe" options={colors} error={formikBag.errors.color != null}></SemanticForm.Dropdown>
+                        <SemanticForm.Dropdown label='Farbe' selection value={formikBag.values.color} onChange={ (e, {value}) => {formikBag.setFieldValue('color', value)}} placeholder="Farbe" options={colors} error={formikBag.errors.color != null}></SemanticForm.Dropdown>
                         {formikBag.errors.color ? <Label pointing color='red'>{formikBag.errors.color}</Label> : null }
                         <Divider />
                         <SemanticForm.Button content={this.props.mode == 'edit' ? 'Bearbeiten' : 'Erstellen'} primary fluid disabled={!formikBag.isValid || formikBag.isSubmitting} loading={formikBag.isSubmitting} />
