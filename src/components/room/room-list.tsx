@@ -23,7 +23,7 @@ class RoomListComponent extends React.Component<RoomListProps, {}> {
     async createRoom() {
         (ReactSwal as SweetAlert2 & ReactSweetAlert & { fire: (options: ReactSweetAlertOptions) => any }).fire({
             title: `Raum erstellen`,
-            html: <EditRoom room={{name: ''}} mode='create' />,
+            html: <EditRoom room={{name: '', color:'red'}} mode='create' />,
             showConfirmButton: false
         });
     }

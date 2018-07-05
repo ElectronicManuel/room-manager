@@ -1,10 +1,9 @@
 import * as React from 'react'
 import RoomListComponent from './components/room/room-list';
 import EventListComponent from './components/event/event-list';
-import Calendar from './components/calendar';
 
 import { firestore, firebase } from './firebase';
-import { Container, Header, Button, Grid } from 'semantic-ui-react';
+import { Container, Header, Button } from 'semantic-ui-react';
 
 type AppState = {
     roomsLoading: boolean,
@@ -59,21 +58,15 @@ export default class App extends React.Component<any, AppState> {
                 <Button color='red' floated='right' onClick={() => {firebase.auth().signOut()}}>Abmelden</Button>
                 </Header>
                 
-                <Grid columns={2} stackable centered>
-                    <Grid.Column floated='left'>
-                        <Header as='h2'>
-                            Räume
-                        </Header>
-                        <RoomListComponent loading={this.state.roomsLoading} rooms={this.state.rooms} setLoading={(loading: boolean) => {this.setState({roomsLoading: loading})}} />
-                    </Grid.Column>
-                    <Grid.Column floated='right'>
-                        <Header as='h2'>
-                            Events
-                        </Header>
-                        <EventListComponent loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} />
-                    </Grid.Column>
-                </Grid>
-                <Calendar />
+                <Header as='h2'>
+                    Events
+                </Header>
+                <EventListComponent loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} />
+
+                <Header as='h2'>
+                    Räume
+                </Header>
+                <RoomListComponent loading={this.state.roomsLoading} rooms={this.state.rooms} setLoading={(loading: boolean) => {this.setState({roomsLoading: loading})}} />
             </Container>
             
         )
