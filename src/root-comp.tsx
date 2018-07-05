@@ -10,6 +10,8 @@ import { Loader, Header, Container } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './style.css';
+import 'react-dates/initialize';
+import 'react-dates/lib/css/_datepicker.css';
 
 type RootCompState = {
     loading: boolean

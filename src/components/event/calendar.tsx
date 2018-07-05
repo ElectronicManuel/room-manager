@@ -36,10 +36,10 @@ class EventCalendar extends React.Component<CalendarProps, any> {
                 <BigCalendar
                     events={this.props.events}
                     startAccessor={(event: RoomManager.Event) => {
-                        return moment().subtract(1, 'days').toDate();
+                        return event.startDate ? moment.unix(event.startDate).toDate() : moment().toDate();
                     }}
                     endAccessor={(event: RoomManager.Event) => {
-                        return moment().add(1, 'days').toDate();
+                        return event.endDate ? moment.unix(event.endDate).toDate() : moment().toDate();
                     }}
                     titleAccessor={(event: RoomManager.Event) => {
                         return `'${event.name}' @ ${this.getRoom(event.roomId).name}`;

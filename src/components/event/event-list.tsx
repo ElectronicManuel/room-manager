@@ -26,7 +26,7 @@ class EventListComponent extends React.Component<EventListProps, {}> {
     async createEvent() {
         (ReactSwal as SweetAlert2 & ReactSweetAlert & { fire: (options: ReactSweetAlertOptions) => any }).fire({
             title: `Event erstellen`,
-            html: <EditEvent event={{name: '', roomId: ''}} mode='create' deleteEvent={() => {}} rooms={this.props.rooms} />,
+            html: <EditEvent event={{name: '', roomId: '', startDate: undefined, endDate: undefined}} mode='create' deleteEvent={() => {}} rooms={this.props.rooms} />,
             showConfirmButton: false
         });
     }

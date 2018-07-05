@@ -2,15 +2,13 @@ import * as React from 'react'
 import { firestore } from '../../firebase';
 import { Formik, FormikProps, FormikErrors } from 'formik';
 import { Form as SemanticForm, Label, Divider, DropdownItemProps } from 'semantic-ui-react';
+import { DayPickerRangeController, FocusedInputShape } from 'react-dates';
+import * as moment from 'moment';
 
 import swal from 'sweetalert2';
 import autobind from 'autobind-decorator';
 
-type EditEvent = {
-    name: string,
-    roomId: string,
-    abcabc: string
-}
+type EditEvent = RoomManager.EventInCreation;
 
 type EditEventProps = {
     event: RoomManager.Event | RoomManager.EventInCreation,
@@ -19,10 +17,17 @@ type EditEventProps = {
     rooms: RoomManager.Room[]
 }
 
-export default class EditEventComp extends React.Component<EditEventProps, any> {
+type EditEventState = {
+    dateInputFocus: FocusedInputShape
+}
+
+export default class EditEventComp extends React.Component<EditEventProps, EditEventState> {
     constructor(props: EditEventProps) {
         super(props);
-        console.log('Event: ', props.event);
+
+        this.state = {
+            dateInputFocus: 'startDate'
+        }
     }
 
     @autobind
@@ -47,11 +52,13 @@ export default class EditEventComp extends React.Component<EditEventProps, any> 
                 isInitialValid={this.props.mode == 'edit'}
                 onSubmit={async (values, actions) => {
                     actions.setSubmitting(true);
-                    const { name, roomId } = values;
+                    const { name, roomId, startDate, endDate } = values;
 
                     const editEvent = {
                         name,
-                        roomId
+                        roomId,
+                        startDate,
+                        endDate
                     }
                     
                     if(this.props.mode == 'create') {
@@ -66,7 +73,6 @@ export default class EditEventComp extends React.Component<EditEventProps, any> 
                 }}
                 validate={(values) => {
                     const { name, roomId } = values;
-                    console.log('values', values);
                     let errors: FormikErrors<EditEvent> = {};
                     if(name.length < 2) {
                         errors.name = 'Der Name muss mindestends 2 Zeichen lang sein'
@@ -83,6 +89,21 @@ export default class EditEventComp extends React.Component<EditEventProps, any> 
                         {formikBag.errors.name ? <Label pointing color='red'>{formikBag.errors.name}</Label> : null }
                         <SemanticForm.Dropdown selection value={formikBag.values.roomId} onChange={ (e, {value}) => {formikBag.setFieldValue('roomId', value)}} placeholder="Raum" options={this.getRoomOptions()} error={formikBag.errors.roomId != null}></SemanticForm.Dropdown>
                         {formikBag.errors.roomId ? <Label pointing color='red'>{formikBag.errors.roomId}</Label> : null }
+                        <div>
+                            <DayPickerRangeController
+                                startDate={formikBag.values.startDate ? moment.unix(formikBag.values.startDate) : null}
+                                endDate={formikBag.values.endDate ? moment.unix(formikBag.values.endDate) : null}
+                                onDatesChange={({ startDate, endDate }) => {
+                                    formikBag.setFieldValue('startDate', startDate ? startDate.unix() : undefined);
+                                    formikBag.setFieldValue('endDate', endDate ? endDate.unix() : null);
+                                }}
+                                focusedInput={this.state.dateInputFocus}
+                                onFocusChange={focusedInput => this.setState({dateInputFocus: (focusedInput as FocusedInputShape)})}
+                                isOutsideRange={(date) => {return false}}
+                                orientation='horizontal'
+                                hideKeyboardShortcutsPanel
+                            />
+                        </div>
                         <Divider />
                         <SemanticForm.Button content={this.props.mode == 'edit' ? 'Bearbeiten' : 'Erstellen'} primary fluid disabled={!formikBag.isValid || formikBag.isSubmitting} loading={formikBag.isSubmitting} />
                         <SemanticForm.Button content='Abbrechen' color='red' fluid onClick={(e) => {e.preventDefault();swal.close()}} />
