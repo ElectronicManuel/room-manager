@@ -81,11 +81,12 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                 isInitialValid={this.props.mode == 'edit'}
                 onSubmit={async (values, actions) => {
                     actions.setSubmitting(true);
-                    const { name, roomId, startDate, endDate } = values;
+                    const { name, roomId, description, startDate, endDate } = values;
 
                     const editEvent = {
                         name,
                         roomId,
+                        description,
                         startDate,
                         endDate
                     }
@@ -101,13 +102,16 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                     actions.setSubmitting(false);
                 }}
                 validate={(values) => {
-                    const { name, roomId, startDate, endDate } = values;
+                    const { name, roomId, description, startDate, endDate } = values;
                     let errors: FormikErrors<EditEvent> = {};
                     if(name.length < 2) {
                         errors.name = 'Der Name muss mindestends 2 Zeichen lang sein'
                     }
                     if(!roomId || roomId.length < 5) {
                         errors.roomId = 'Bitte wähle einen Raum';
+                    }
+                    if(!description) {
+                        errors.roomId = 'Bitte füge eine Beschreibung hinzu!';
                     }
                     if(!startDate) {
                         errors.startDate = 'Bitte wähle ein Start Datum'
@@ -127,6 +131,8 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                     <SemanticForm onSubmit={formikBag.handleSubmit} loading={formikBag.isSubmitting}>
                         <SemanticForm.Input disabled={!this.canEdit()} label='Name' error={formikBag.errors.name != null} placeholder='Name des Events' name='name' value={formikBag.values.name} onChange={formikBag.handleChange} />
                         {formikBag.errors.name ? <Label pointing color='red'>{formikBag.errors.name}</Label> : null }
+                        <SemanticForm.Input disabled={!this.canEdit()} label='Beschreibung' error={formikBag.errors.description != null} placeholder='Beschreibung des Events' name='description' value={formikBag.values.description} onChange={formikBag.handleChange} />
+                        {formikBag.errors.description ? <Label pointing color='red'>{formikBag.errors.description}</Label> : null }
                         <SemanticForm.Dropdown disabled={!this.canEdit()} label='Raum' selection value={formikBag.values.roomId} onChange={ (e, {value}) => {formikBag.setFieldValue('roomId', value)}} placeholder="Raum" options={this.getRoomOptions()} error={formikBag.errors.roomId != null}></SemanticForm.Dropdown>
                         {formikBag.errors.roomId ? <Label pointing color='red'>{formikBag.errors.roomId}</Label> : null }
                         <SemanticForm.Group>

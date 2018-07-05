@@ -20,7 +20,8 @@ class EventCalendar extends React.Component<CalendarProps, any> {
     getRoom(roomId: string) {
         const defaultRoom: RoomManager.RoomInCreation = {
             name: 'Kein Raum',
-            color: 'black'
+            color: 'black',
+            description: 'Keine Beschreibung'
         }
         const foundRoom = this.props.rooms.find((room) => room._id == roomId);
         if(foundRoom) {

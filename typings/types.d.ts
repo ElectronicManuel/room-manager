@@ -6,7 +6,8 @@ declare namespace RoomManager {
 
     interface RoomInCreation {
         name: string,
-        color: string
+        color: string,
+        description: string,
     }
 
     type Room = RoomInCreation & HasId & {
@@ -17,6 +18,7 @@ declare namespace RoomManager {
     interface EventInCreation {
         name: string,
         roomId: string,
+        description: string,
         startDate?: number,
         endDate?: number
     }

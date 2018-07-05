@@ -78,9 +78,9 @@ export default class EditRoomComp extends React.Component<EditRoomProps, any> {
                 isInitialValid={this.props.mode == 'edit'}
                 onSubmit={async (values, actions) => {
                     actions.setSubmitting(true);
-                    const { name, color } = values;
+                    const { name, color, description } = values;
                     
-                    const editedRoom = { name, color };
+                    const editedRoom = { name, color, description };
                     console.log('edited room: ', editedRoom);
 
                     if(this.props.mode == 'create') {
@@ -93,7 +93,7 @@ export default class EditRoomComp extends React.Component<EditRoomProps, any> {
 
                     actions.setSubmitting(false);
                 }}
-                validate={({name, color}) => {
+                validate={({name, color, description}) => {
                     let errors: FormikErrors<EditRoom> = {};
                     if(name.length < 2) {
                         errors.name = 'Der Name muss mindestends 2 Zeichen lang sein'
@@ -101,12 +101,17 @@ export default class EditRoomComp extends React.Component<EditRoomProps, any> {
                     if(!color) {
                         errors.color = 'Du musst eine Farbe auswählen';
                     }
+                    if(!description) {
+                        errors.description = 'Du musst eine Beschreibung hinzufügen!';
+                    }
                     return errors;
                 }}
                 render={(formikBag: FormikProps<EditRoom>) => (
                     <SemanticForm onSubmit={formikBag.handleSubmit} loading={formikBag.isSubmitting}>
                         <SemanticForm.Input label='Name' placeholder='Name des Raumes' name='name' value={formikBag.values.name} onChange={formikBag.handleChange} error={formikBag.errors.name != null} />
                         {formikBag.errors.name ? <Label pointing color='red'>{formikBag.errors.name}</Label> : null }
+                        <SemanticForm.Input label='Beschreibung' placeholder='Beschreibung des Raumes' name='description' value={formikBag.values.description} onChange={formikBag.handleChange} error={formikBag.errors.description != null} />
+                        {formikBag.errors.description ? <Label pointing color='red'>{formikBag.errors.description}</Label> : null }
                         <SemanticForm.Dropdown label='Farbe' selection value={formikBag.values.color} onChange={ (e, {value}) => {formikBag.setFieldValue('color', value)}} placeholder="Farbe" options={colors} error={formikBag.errors.color != null}></SemanticForm.Dropdown>
                         {formikBag.errors.color ? <Label pointing color='red'>{formikBag.errors.color}</Label> : null }
                         <Divider />
