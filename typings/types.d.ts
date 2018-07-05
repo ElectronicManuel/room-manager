@@ -18,7 +18,8 @@ declare namespace RoomManager {
         name: string,
         roomId: string,
         startDate?: number,
-        endDate?: number
+        endDate?: number,
+        userId: string
     }
 
     type Event = EventInCreation & HasId;
@@ -26,6 +27,7 @@ declare namespace RoomManager {
     type Role = 'User' | 'Verwaltung' | 'Hauswart';
 
     interface User {
+        _id?: string,
         role: Role,
         displayName: string
     }

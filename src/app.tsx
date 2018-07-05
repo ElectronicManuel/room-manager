@@ -12,13 +12,16 @@ type AppProps = {
 type AppState = {
     roomsLoading: boolean,
     eventsLoading: boolean,
+    usersLoading: boolean,
     rooms: RoomManager.Room[],
-    events: RoomManager.Event[]
+    events: RoomManager.Event[],
+    users: RoomManager.User[]
 }
 
 export default class App extends React.Component<AppProps, AppState> {
     cancelRoomsListener: Function
     cancelEventsListener: Function
+    cancelUsersListener: Function
 
     constructor(props: any) {
         super(props);
@@ -26,8 +29,10 @@ export default class App extends React.Component<AppProps, AppState> {
         this.state = {
             rooms: [],
             events: [],
+            users: [],
             roomsLoading: true,
-            eventsLoading: true
+            eventsLoading: true,
+            usersLoading: true
         }
     }
 
@@ -47,11 +52,19 @@ export default class App extends React.Component<AppProps, AppState> {
             });
             this.setState({events, eventsLoading: false});
         });
+        this.cancelUsersListener = firestore.collection('users').onSnapshot(snapshot => {
+            const users: RoomManager.User[] = [];
+            snapshot.docs.forEach(user => {
+                users.push(({...user.data(), _id: user.id} as RoomManager.User));
+            });
+            this.setState({users, usersLoading: false});
+        });
     }
 
     componentWillUnmount() {
         if(this.cancelRoomsListener) this.cancelRoomsListener();
         if(this.cancelEventsListener) this.cancelEventsListener();
+        if(this.cancelUsersListener) this.cancelUsersListener();
     }
 
     public render() {
@@ -64,7 +77,7 @@ export default class App extends React.Component<AppProps, AppState> {
                 <Header as='h2'>
                     Events
                 </Header>
-                <EventListComponent loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} userDetails={this.props.userDetails} />
+                <EventListComponent loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} userDetails={this.props.userDetails} users={this.state.users} />
 
                 {this.props.userDetails.role == 'Verwaltung' ? 
                     <div>

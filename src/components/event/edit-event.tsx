@@ -1,10 +1,9 @@
 import * as React from 'react'
-import { firestore } from '../../firebase';
+import { firestore, firebase } from '../../firebase';
 import { Formik, FormikProps, FormikErrors } from 'formik';
 import { Form as SemanticForm, Label, Divider, DropdownItemProps } from 'semantic-ui-react';
 import { DayPickerRangeController, FocusedInputShape } from 'react-dates';
 import * as moment from 'moment';
-
 import swal from 'sweetalert2';
 import autobind from 'autobind-decorator';
 
@@ -16,6 +15,7 @@ type EditEventProps = {
     deleteEvent: () => void,
     rooms: RoomManager.Room[],
     userDetails: RoomManager.User
+    users: RoomManager.User[]
 }
 
 type EditEventState = {
@@ -57,6 +57,11 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
     }
 
     @autobind
+    getUser(userId: string) {
+        return (this.props.users.find((user) => user._id == userId) as RoomManager.User);
+    }
+
+    @autobind
     getRoom(roomId: string) {
         return this.props.rooms.find((room) => room._id == roomId);
     }
@@ -82,12 +87,13 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                 onSubmit={async (values, actions) => {
                     actions.setSubmitting(true);
                     const { name, roomId, startDate, endDate } = values;
-
+                    const userId = (firebase.auth().currentUser as firebase.User).uid;
                     const editEvent = {
                         name,
                         roomId,
                         startDate,
-                        endDate
+                        endDate,
+                        userId
                     }
                     
                     if(this.props.mode == 'create') {
@@ -119,8 +125,7 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                         if(startDate >= endDate) {
                             errors.endDate = 'Das End Datum muss nach dem Start Datum liegen';
                         }
-                    }
-
+                    }               
                     return errors;
                 }}
                 render={(formikBag: FormikProps<EditEvent>) => (
@@ -141,6 +146,9 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                                 {formikBag.errors.endDate ? <Label pointing color='red'>{formikBag.errors.endDate}</Label> : null }
                             </SemanticForm.Field>
                         </SemanticForm.Group>
+                        
+                        <SemanticForm.Input disabled={true} label='Host' error={formikBag.errors.userId != null} placeholder='Name des Users' name='host' value={this.getUser(formikBag.values.userId).displayName}/>
+
                         {
                             this.canEdit() ?
                             <div>
