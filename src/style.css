@@ -1,3 +1,7 @@
 hidden {
     display: none !important;
 }
+
+.event-display {
+    mix-blend-mode: difference;
+}

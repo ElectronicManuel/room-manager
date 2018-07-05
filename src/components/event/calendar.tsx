@@ -45,7 +45,17 @@ class EventCalendar extends React.Component<CalendarProps, any> {
                         return `'${event.name}' @ ${this.getRoom(event.roomId).name}`;
                     }}
                     allDayAccessor={(event: RoomManager.Event) => {return true}}
-                    eventPropGetter={(event: RoomManager.Event) => {return {style: {backgroundColor: this.getRoom(event.roomId).color}}}}
+                    eventPropGetter={(event: RoomManager.Event) => {
+                        const eventProps = {
+                            style: {
+                                backgroundColor: this.getRoom(event.roomId).color,
+                                color: isTooDark(this.getRoom(event.roomId).color) ? 'white' : 'black'
+                            },
+                            className: 'event-display'
+                        }
+
+                        return eventProps;
+                    }}
                     popup={true}
                     onSelectEvent={(event: RoomManager.Event) => {
                         this.props.editEvent(event);
@@ -69,6 +79,16 @@ class EventCalendar extends React.Component<CalendarProps, any> {
             </div>
         )
     }
+}
+
+function isTooDark(hexcolor: string) {
+    const color = hexcolor.substring(1);
+    var r = parseInt(color.substr(1,2),16);
+    var g = parseInt(color.substr(3,2),16);
+    var b = parseInt(color.substr(4,2),16);
+    var yiq = ((r*299)+(g*587)+(b*114))/1000;
+    console.log(yiq);
+    return (yiq < 100);
 }
 
 export default EventCalendar;
