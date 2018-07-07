@@ -5,3 +5,7 @@ hidden {
 .event-display {
     mix-blend-mode: difference;
 }
+
+.date-picker-field:focus {
+    background-color: #00a699 !important;
+}
