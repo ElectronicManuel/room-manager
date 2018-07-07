@@ -4,21 +4,25 @@ import EventListComponent from './components/event/event-list';
 
 import { firestore } from './firebase';
 import { Container, Header } from 'semantic-ui-react';
+import UserListComponent from './components/users/user-list';
 
 type AppProps = {
     userDetails: RoomManager.User
 }
 
 type AppState = {
+    rooms: RoomManager.Room[],
+    events: RoomManager.Event[],
+    users: RoomManager.UserWithId[],
     roomsLoading: boolean,
     eventsLoading: boolean,
-    rooms: RoomManager.Room[],
-    events: RoomManager.Event[]
+    usersLoading: boolean
 }
 
 export default class App extends React.Component<AppProps, AppState> {
-    cancelRoomsListener: Function
-    cancelEventsListener: Function
+    cancelRoomsListener: () => any
+    cancelEventsListener: () => any
+    cancelUsersListener: () => any
 
     constructor(props: any) {
         super(props);
@@ -26,8 +30,10 @@ export default class App extends React.Component<AppProps, AppState> {
         this.state = {
             rooms: [],
             events: [],
+            users: [],
             roomsLoading: true,
-            eventsLoading: true
+            eventsLoading: true,
+            usersLoading: true
         }
     }
 
@@ -47,11 +53,20 @@ export default class App extends React.Component<AppProps, AppState> {
             });
             this.setState({events, eventsLoading: false});
         });
+
+        this.cancelUsersListener = firestore.collection('users').onSnapshot(snapshot => {
+            const users: RoomManager.UserWithId[] = [];
+            snapshot.docs.forEach(user => {
+                users.push(({...user.data(), _id: user.id} as RoomManager.UserWithId));
+            });
+            this.setState({users, usersLoading: false});
+        });
     }
 
     componentWillUnmount() {
         if(this.cancelRoomsListener) this.cancelRoomsListener();
         if(this.cancelEventsListener) this.cancelEventsListener();
+        if(this.cancelUsersListener) this.cancelUsersListener();
     }
 
     public render() {
@@ -72,6 +87,15 @@ export default class App extends React.Component<AppProps, AppState> {
                             Räume
                         </Header>
                         <RoomListComponent loading={this.state.roomsLoading} rooms={this.state.rooms} setLoading={(loading: boolean) => {this.setState({roomsLoading: loading})}} />
+                    </div>
+                : null}
+
+                {this.props.userDetails.role == 'Verwaltung' ? 
+                    <div>
+                        <Header as='h2'>
+                            Benutzer
+                        </Header>
+                        <UserListComponent loading={this.state.usersLoading} users={this.state.users} setLoading={(loading: boolean) => {this.setState({usersLoading: loading})}} />
                     </div>
                 : null}
             </Container>

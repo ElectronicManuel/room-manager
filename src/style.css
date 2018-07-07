@@ -9,3 +9,7 @@ hidden {
 .date-picker-field:focus {
     background-color: #00a699 !important;
 }
+
+.user-self {
+    background-color: #91bce4 !important;
+}
