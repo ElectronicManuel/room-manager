@@ -81,10 +81,18 @@ const RootComponent = withRouter(class Root extends React.Component<RouterProps,
             </Link>
         ];
         
-        if(this.state.userDetails && this.state.userDetails.role == 'Verwaltung') {
+        if(this.state.userDetails) {
+            if(this.state.userDetails.role == 'Verwaltung') {
+                menuItems.push(
+                    <Link to='/users' key={3}>
+                        <Menu.Item name='Benutzer' active={this.props.history.location.pathname == '/users'} />
+                    </Link>
+                );
+            }
+        } else {
             menuItems.push(
-                <Link to='/users' key={3}>
-                    <Menu.Item name='Benutzer' active={this.props.history.location.pathname == '/users'} />
+                <Link to='/login' key={3}>
+                    <Menu.Item name='Anmelden' active={this.props.history.location.pathname == '/login'} />
                 </Link>
             );
         }
