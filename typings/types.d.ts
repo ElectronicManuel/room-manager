@@ -27,8 +27,11 @@ declare namespace RoomManager {
 
     interface User {
         role: Role,
-        displayName: string
+        displayName: string,
+        photo?: string
     }
+
+    type UserWithId = User & HasId;
 }
 
 declare module 'react-firebaseui';

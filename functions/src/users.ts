@@ -25,7 +25,8 @@ export const setupUserInFirestore = async (user: admin.auth.UserRecord) => {
 
     return firestore.doc(`users/${uid}`).set({
         role: 'user',
-        displayName: getDisplayName(user)
+        displayName: getDisplayName(user),
+        photo: user.photoURL
     });
 }
 
@@ -38,7 +39,8 @@ export const initUnsetUser = async (user: admin.auth.UserRecord) => {
 
     const defaultUser = {
         role: 'user',
-        displayName: getDisplayName(user)
+        displayName: getDisplayName(user),
+        photo: user.photoURL
     }
 
     if(!doc.exists) {
@@ -49,11 +51,13 @@ export const initUnsetUser = async (user: admin.auth.UserRecord) => {
     } else {
         const userData: {
             role: string,
-            displayName: string
+            displayName: string,
+            photo: string
         } = (doc.data() as any);
         const updateUser: {
             role?: string,
-            displayName?: string
+            displayName?: string,
+            photo?: string
         } = {};
         if(!userData.role) {
             updateUser.role = 'user';
@@ -61,6 +65,10 @@ export const initUnsetUser = async (user: admin.auth.UserRecord) => {
         }
         if(!userData.displayName) {
             updateUser.displayName = defaultUser.displayName;
+            neededFix = true;
+        }
+        if(!userData.photo) {
+            updateUser.photo = defaultUser.photo;
             neededFix = true;
         }
 
