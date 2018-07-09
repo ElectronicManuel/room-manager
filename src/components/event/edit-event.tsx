@@ -3,7 +3,11 @@ import { firestore, firebase } from '../../firebase';
 import { Formik, FormikProps, FormikErrors } from 'formik';
 import { Form as SemanticForm, Label, Divider, DropdownItemProps } from 'semantic-ui-react';
 import { DayPickerRangeController, FocusedInputShape } from 'react-dates';
-import * as moment from 'moment';
+import * as Moment from 'moment';
+import { extendMoment, DateRange } from 'moment-range';
+
+const moment = extendMoment(Moment);
+
 import swal from 'sweetalert2';
 import autobind from 'autobind-decorator';
 
@@ -14,12 +18,16 @@ type EditEventProps = {
     mode: 'create' | 'edit',
     deleteEvent: () => void,
     rooms: RoomManager.Room[],
+    events: RoomManager.Event[],
     userDetails: RoomManager.User
     users: RoomManager.User[]
 }
 
 type EditEventState = {
-    dateInputFocus: FocusedInputShape
+    dateInputFocus: FocusedInputShape,
+    usedDates: {
+        [roomId: string]: Array<DateRange>
+    }
 }
 
 export default class EditEventComp extends React.Component<EditEventProps, EditEventState> {
@@ -31,7 +39,8 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
         super(props);
 
         this.state = {
-            dateInputFocus: 'startDate'
+            dateInputFocus: 'startDate',
+            usedDates: {}
         }
     }
 
@@ -39,6 +48,35 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
         if(this.startRef) {
             this.startRef.focus();
         }
+
+        const usedDates: {
+            [roomId: string]: Array<DateRange>
+        } = {};
+        this.props.events.map(event => {
+            let eventId: string | null = null;
+            if('_id' in this.props.event) {
+                eventId = this.props.event._id;
+            }
+            if(eventId) {
+                if(event._id == eventId) {
+                    return;
+                }
+            }
+            if(event.startDate && event.endDate) {
+                const from = Moment.unix(event.startDate).subtract(12, 'hour');
+                const to = Moment.unix(event.endDate);
+                const range = moment.range(from, to);
+                if(usedDates[event.roomId]) {
+                    usedDates[event.roomId].push(range);
+                } else {
+                    usedDates[event.roomId] = [range];
+                }
+            } else {
+                return;
+            }
+        });
+        console.log(usedDates);
+        this.setState({usedDates});
     }
 
     @autobind
@@ -115,6 +153,7 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                 }}
                 validate={(values) => {
                     const { name, roomId, startDate, endDate } = values;
+
                     let errors: FormikErrors<EditEvent> = {};
                     if(name.length < 2) {
                         errors.name = 'Der Name muss mindestends 2 Zeichen lang sein'
@@ -132,7 +171,17 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                         if(startDate >= endDate) {
                             errors.endDate = 'Das End Datum muss nach dem Start Datum liegen';
                         }
-                    }               
+                    }
+
+                    if(this.state.usedDates[values.roomId]) {
+                        if(values.startDate && values.endDate) {
+                            const range = moment.range(Moment.unix(values.startDate), Moment.unix(values.endDate));
+                            for(const usedDate of this.state.usedDates[values.roomId]) {
+                                if(usedDate.overlaps(range)) errors.startDate = 'Du darfst einen Raum nicht doppelt buchen!';
+                            };
+                        }
+                    }
+
                     return errors;
                 }}
                 render={(formikBag: FormikProps<EditEvent>) => (
@@ -141,15 +190,15 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                         {formikBag.errors.name ? <Label pointing color='red'>{formikBag.errors.name}</Label> : null }
                         <SemanticForm.Dropdown disabled={!this.canEdit()} label='Raum' selection value={formikBag.values.roomId} onChange={ (e, {value}) => {formikBag.setFieldValue('roomId', value)}} placeholder="Raum" options={this.getRoomOptions()} error={formikBag.errors.roomId != null}></SemanticForm.Dropdown>
                         {formikBag.errors.roomId ? <Label pointing color='red'>{formikBag.errors.roomId}</Label> : null }
-                        <SemanticForm.Group>
-                            <SemanticForm.Field disabled={!this.canEdit()} error={formikBag.errors.startDate != null}>
+                        <SemanticForm.Group widths='2' unstackable>
+                            <SemanticForm.Field  disabled={!this.canEdit()} error={formikBag.errors.startDate != null}>
                                 <label>Start Datum</label>
-                                <input readOnly ref={ref => this.startRef = ref} onFocus={() => {this.setState({dateInputFocus: 'startDate'})}} placeholder='Start Datum' value={formikBag.values.startDate ? moment.unix(formikBag.values.startDate).format('DD.MM.YYYY') : 'Nicht definiert'} />
+                                <input className='date-picker-field' readOnly ref={ref => this.startRef = ref} onFocus={() => {this.setState({dateInputFocus: 'startDate'})}} placeholder='Start Datum' value={formikBag.values.startDate ? Moment.unix(formikBag.values.startDate).format('DD.MM.YYYY') : 'Nicht definiert'} />
                                 {formikBag.errors.startDate ? <Label pointing color='red'>{formikBag.errors.startDate}</Label> : null }
                             </SemanticForm.Field>
-                            <SemanticForm.Field disabled={!this.canEdit()} error={formikBag.errors.endDate != null}>
+                            <SemanticForm.Field  disabled={!this.canEdit()} error={formikBag.errors.endDate != null}>
                                 <label>End Datum</label>
-                                <input readOnly ref={ref => this.endRef = ref} onFocus={() => {this.setState({dateInputFocus: 'endDate'})}} placeholder='End Datum' value={formikBag.values.endDate ? moment.unix(formikBag.values.endDate).format('DD.MM.YYYY') : 'Nicht definiert'} />
+                                <input className='date-picker-field' readOnly ref={ref => this.endRef = ref} onFocus={() => {this.setState({dateInputFocus: 'endDate'})}} placeholder='End Datum' value={formikBag.values.endDate ? Moment.unix(formikBag.values.endDate).format('DD.MM.YYYY') : 'Nicht definiert'} />
                                 {formikBag.errors.endDate ? <Label pointing color='red'>{formikBag.errors.endDate}</Label> : null }
                             </SemanticForm.Field>
                         </SemanticForm.Group>
@@ -167,8 +216,8 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                             <div>
                                 <div>
                                     <DayPickerRangeController
-                                        startDate={formikBag.values.startDate ? moment.unix(formikBag.values.startDate) : null}
-                                        endDate={formikBag.values.endDate ? moment.unix(formikBag.values.endDate) : null}
+                                        startDate={formikBag.values.startDate ? Moment.unix(formikBag.values.startDate) : null}
+                                        endDate={formikBag.values.endDate ? Moment.unix(formikBag.values.endDate) : null}
                                         onDatesChange={({ startDate, endDate }) => {
                                             formikBag.setFieldValue('startDate', startDate ? startDate.unix() : undefined);
                                             formikBag.setFieldValue('endDate', endDate ? endDate.unix() : null);
@@ -178,7 +227,17 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                                         isOutsideRange={(date) => {return false}}
                                         orientation='horizontal'
                                         hideKeyboardShortcutsPanel
-                                        isDayBlocked={() => !this.canEdit()}
+                                        isDayBlocked={(day: Moment.Moment) => {
+                                            if(!this.canEdit()) return true;
+                                            
+                                            let blocked = false;
+                                            if(this.state.usedDates[formikBag.values.roomId]) {
+                                                this.state.usedDates[formikBag.values.roomId].map(usedDate => {
+                                                    if(usedDate.contains(day)) blocked = true;
+                                                });
+                                            }
+                                            return blocked;
+                                        } }
                                     />
                                 </div>
                                 <Divider />
