@@ -3,7 +3,7 @@ import RoomListComponent from './components/room/room-list';
 import EventListComponent from './components/event/event-list';
 
 import { firestore } from './firebase';
-import { Container, Header, Message } from 'semantic-ui-react';
+import { Container, Message } from 'semantic-ui-react';
 import UserListComponent from './components/users/user-list';
 import { Switch, Route } from 'react-router';
 
@@ -81,19 +81,20 @@ export default class App extends React.Component<AppProps, AppState> {
                             return <Message error>Du darfst diese Seite nicht ansehen.</Message>
                         }
                     }} />
+                    <Route path='/rooms' render={() => {
+                        if(this.props.userDetails.role == 'Verwaltung') {
+                            
+                            return <RoomListComponent loading={this.state.roomsLoading} rooms={this.state.rooms} setLoading={(loading: boolean) => {this.setState({roomsLoading: loading})}} />
+                        } else {
+                            return <Message error>Du darfst diese Seite nicht ansehen.</Message>
+                        }
+                    }} />
                     <Route path='/' render={() => (
                         <div>
-                            <EventListComponent loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} userDetails={this.props.userDetails} />
-                            {this.props.userDetails.role == 'Verwaltung' ? 
-                                <div>
-                                    <Header as='h2'>
-                                        Räume
-                                    </Header>
-                                    <RoomListComponent loading={this.state.roomsLoading} rooms={this.state.rooms} setLoading={(loading: boolean) => {this.setState({roomsLoading: loading})}} />
-                                </div>
-                            : null}
+                            <EventListComponent loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} userDetails={this.props.userDetails} />                     
                         </div>
                     )} />
+                     
                 </Switch>
             </Container>
             

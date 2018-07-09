@@ -84,6 +84,11 @@ const RootComponent = withRouter(class Root extends React.Component<RouterProps,
         if(this.state.userDetails) {
             if(this.state.userDetails.role == 'Verwaltung') {
                 menuItems.push(
+                    <Link to='/rooms' key={2}>
+                        <Menu.Item name='Raum' active={this.props.history.location.pathname == '/rooms'} />
+                    </Link>
+                );
+                menuItems.push(
                     <Link to='/users' key={3}>
                         <Menu.Item name='Benutzer' active={this.props.history.location.pathname == '/users'} />
                     </Link>
