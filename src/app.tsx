@@ -90,13 +90,13 @@ export default class App extends React.Component<AppProps, AppState> {
                     }} />
                     <Route path='/events' render={() => {
                         if(this.props.userDetails.role === 'Verwaltung' || this.props.userDetails.role === 'Hauswart') {
-                            return <EventOverview mode='list' loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} userDetails={this.props.userDetails} /> 
+                            return <EventOverview mode='list' loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} userDetails={this.props.userDetails} users={this.state.users} /> 
                         } else {
                             return <Message error>Du darfst diese Seite nicht ansehen.</Message>
                         }
                     }} />
                     <Route path='/' render={() => (
-                        <EventOverview mode='overview' loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} userDetails={this.props.userDetails} />                     
+                        <EventOverview mode='overview' loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} userDetails={this.props.userDetails} users={this.state.users} />                     
                     )} />
                      
                 </Switch>

@@ -13,3 +13,7 @@ hidden {
 .user-self {
     background-color: #91bce4 !important;
 }
+
+.ui.form .disabled.field, .ui.form .disabled.fields .field, .ui.form .field :disabled {
+    opacity: 1 !important;
+}
