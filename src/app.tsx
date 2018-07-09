@@ -1,9 +1,9 @@
 import * as React from 'react'
 import RoomListComponent from './components/room/room-list';
-import EventListComponent from './components/event/event-list';
+import EventOverview from './components/event/event-overview';
 
 import { firestore } from './firebase';
-import { Container, Header, Message } from 'semantic-ui-react';
+import { Container, Message } from 'semantic-ui-react';
 import UserListComponent from './components/users/user-list';
 import { Switch, Route } from 'react-router';
 
@@ -75,25 +75,30 @@ export default class App extends React.Component<AppProps, AppState> {
             <Container>
                 <Switch>
                     <Route path='/users' render={() => {
-                        if(this.props.userDetails.role == 'Verwaltung') {
+                        if(this.props.userDetails.role === 'Verwaltung') {
                             return <UserListComponent loading={this.state.usersLoading} users={this.state.users} setLoading={(loading: boolean) => {this.setState({usersLoading: loading})}} />;
                         } else {
                             return <Message error>Du darfst diese Seite nicht ansehen.</Message>
                         }
                     }} />
+                    <Route path='/rooms' render={() => {
+                        if(this.props.userDetails.role === 'Verwaltung') {
+                            return <RoomListComponent loading={this.state.roomsLoading} rooms={this.state.rooms} setLoading={(loading: boolean) => {this.setState({roomsLoading: loading})}} />
+                        } else {
+                            return <Message error>Du darfst diese Seite nicht ansehen.</Message>
+                        }
+                    }} />
+                    <Route path='/events' render={() => {
+                        if(this.props.userDetails.role === 'Verwaltung' || this.props.userDetails.role === 'Hauswart') {
+                            return <EventOverview mode='list' loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} userDetails={this.props.userDetails} users={this.state.users} /> 
+                        } else {
+                            return <Message error>Du darfst diese Seite nicht ansehen.</Message>
+                        }
+                    }} />
                     <Route path='/' render={() => (
-                        <div>
-                            <EventListComponent loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} userDetails={this.props.userDetails} users={this.state.users} />
-                            {this.props.userDetails.role == 'Verwaltung' ? 
-                                <div>
-                                    <Header as='h2'>
-                                        Räume
-                                    </Header>
-                                    <RoomListComponent loading={this.state.roomsLoading} rooms={this.state.rooms} setLoading={(loading: boolean) => {this.setState({roomsLoading: loading})}} />
-                                </div>
-                            : null}
-                        </div>
+                        <EventOverview mode='overview' loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} userDetails={this.props.userDetails} users={this.state.users} />                     
                     )} />
+                     
                 </Switch>
             </Container>
             

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import EditEvent from './edit-event';
-import { Divider, Button, Loader, Grid } from 'semantic-ui-react';
+import { Divider, Button, Loader, Grid, Card } from 'semantic-ui-react';
 import autobind from 'autobind-decorator';
 import swal from 'sweetalert2';
 import withReactContent, { SweetAlert2, ReactSweetAlert, ReactSweetAlertOptions } from 'sweetalert2-react-content';
@@ -16,10 +16,11 @@ type EventListProps = {
     rooms: RoomManager.Room[],
     setLoading: (loading: boolean) => void,
     userDetails: RoomManager.User,
+    mode: 'overview' | 'list',
     users: RoomManager.User[]
 }
 
-class EventListComponent extends React.Component<EventListProps, {}> {
+class EventOverview extends React.Component<EventListProps, {}> {
     constructor(props: EventListProps) {
         super(props);
     }
@@ -72,6 +73,31 @@ class EventListComponent extends React.Component<EventListProps, {}> {
     }
 
     render() {
+        const eventList = this.props.events.map((event: RoomManager.Event) => {
+            return (
+                <Card key={event._id} fluid>
+                    <Card.Content>
+                        <Card.Header>{event.name}</Card.Header>
+                    </Card.Content>
+                    <Card.Content extra>
+                        <Button.Group fluid>
+                            <Button basic primary onClick={() => { this.editEvent(event) }}>
+                                {this.props.userDetails.role !== 'Hauswart' ? 'Bearbeiten' : 'Details'}
+                            </Button>
+                            {
+                                this.props.userDetails.role !== 'Hauswart' ?
+                                    <Button basic color='red' onClick={() => { this.deleteEvent(event) }}>
+                                        Löschen
+                                    </Button>
+                                :
+                                    null
+                            }
+                        </Button.Group>
+                    </Card.Content>
+                </Card>
+            )
+        });
+
         return (
             <div>
                 {
@@ -87,11 +113,18 @@ class EventListComponent extends React.Component<EventListProps, {}> {
                     </Loader>
                 </Grid>
                 {
-                    !this.props.loading ? <Calendar events={this.props.events} editEvent={this.editEvent} deleteEvent={this.deleteEvent} rooms={this.props.rooms} /> : null
+                    !this.props.loading ? 
+                        this.props.mode === 'overview' ?
+                            <Calendar events={this.props.events} editEvent={this.editEvent} deleteEvent={this.deleteEvent} rooms={this.props.rooms} />
+                        :
+                        <Card.Group stackable>
+                            {eventList}
+                        </Card.Group>
+                    : null
                 }
             </div>
         );
     }
 }
 
-export default EventListComponent;
+export default EventOverview;

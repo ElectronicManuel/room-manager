@@ -48,7 +48,7 @@ class SignInScreen extends React.Component<{
     render() {
         return (
             <div>
-                <Header as='h3'>
+                <Header as='h3' style={{textAlign: 'center'}}>
                     Bitte anmelden
                 </Header>
                 <StyledFirebaseAuth uiConfig={this.state.uiConfig} firebaseAuth={firebase.auth()}/>
