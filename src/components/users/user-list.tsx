@@ -63,7 +63,7 @@ class UserListComponent extends React.Component<UserListProps, UserListState> {
                     </Loader>
                 </Grid>
 
-                <Card.Group stackable>
+                <Card.Group doubling stackable itemsPerRow={3}>
                     {userList}
                 </Card.Group>
             </div>

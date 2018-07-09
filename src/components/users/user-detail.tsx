@@ -69,7 +69,7 @@ class UserDetail extends React.Component<UserDetailProps, UserDetailState> {
     render() {
         const isSelf = firebase.auth().currentUser != null ? (firebase.auth().currentUser as firebase.User).uid == this.props.user._id : false;
         return (
-            <Card color={this.getColor()} className={isSelf ? 'user-self' : ''}>
+            <Card color={this.getColor()} className={isSelf ? 'user-self' : ''} fluid>
                 <Card.Content>
                     <Image src={this.props.user.photo ? this.props.user.photo : 'https://react.semantic-ui.com/images/avatar/large/matthew.png'} className='user-photo' avatar floated='right' />
                     <Card.Header>
