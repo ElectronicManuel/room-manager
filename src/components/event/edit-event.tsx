@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { firestore } from '../../firebase';
+import { firestore, firebase } from '../../firebase';
 import { Formik, FormikProps, FormikErrors } from 'formik';
 import { Form as SemanticForm, Label, Divider, DropdownItemProps } from 'semantic-ui-react';
 import { DayPickerRangeController, FocusedInputShape } from 'react-dates';
@@ -20,6 +20,7 @@ type EditEventProps = {
     rooms: RoomManager.Room[],
     events: RoomManager.Event[],
     userDetails: RoomManager.User
+    users: RoomManager.User[]
 }
 
 type EditEventState = {
@@ -94,6 +95,13 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
     }
 
     @autobind
+    getUserName(userId: string) {
+        console.log(userId);
+        const foundUser = this.props.users.find((user) => user._id == userId);
+        return foundUser != null ? foundUser.displayName : 'N/A';
+    }
+
+    @autobind
     getRoom(roomId: string) {
         return this.props.rooms.find((room) => room._id == roomId);
     }
@@ -112,19 +120,25 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
     }
 
     render() {
+        const initial = { ...this.props.event };
+        if(this.props.mode == 'create') {
+            initial.userId = (firebase.auth().currentUser as firebase.User).uid
+        }
+
         return (
             <Formik
-                initialValues={{ ...this.props.event }}
+                initialValues={initial}
                 isInitialValid={this.props.mode == 'edit'}
                 onSubmit={async (values, actions) => {
                     actions.setSubmitting(true);
                     const { name, roomId, startDate, endDate } = values;
-
+                    const userId = (firebase.auth().currentUser as firebase.User).uid;
                     const editEvent = {
                         name,
                         roomId,
                         startDate,
-                        endDate
+                        endDate,
+                        userId
                     }
                     
                     if(this.props.mode == 'create') {
@@ -188,6 +202,15 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                                 {formikBag.errors.endDate ? <Label pointing color='red'>{formikBag.errors.endDate}</Label> : null }
                             </SemanticForm.Field>
                         </SemanticForm.Group>
+                        
+
+                        {
+                            this.props.userDetails.role == 'Verwaltung' || this.props.userDetails.role == 'Hauswart' || formikBag.values.userId == (firebase.auth().currentUser as firebase.User).uid?
+                            <SemanticForm.Input disabled={true} label='Host' error={formikBag.errors.userId != null} placeholder='Name des Users' name='host' value={this.getUserName(formikBag.values.userId)}/>
+                            :
+                                null
+                        }
+                 
                         {
                             this.canEdit() ?
                             <div>

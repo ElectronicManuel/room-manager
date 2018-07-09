@@ -83,7 +83,7 @@ export default class App extends React.Component<AppProps, AppState> {
                     }} />
                     <Route path='/' render={() => (
                         <div>
-                            <EventListComponent loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} userDetails={this.props.userDetails} />
+                            <EventListComponent loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} userDetails={this.props.userDetails} users={this.state.users} />
                             {this.props.userDetails.role == 'Verwaltung' ? 
                                 <div>
                                     <Header as='h2'>
