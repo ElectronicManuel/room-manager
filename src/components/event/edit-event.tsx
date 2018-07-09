@@ -57,8 +57,10 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
     }
 
     @autobind
-    getUser(userId: string) {
-        return (this.props.users.find((user) => user._id == userId) as RoomManager.User);
+    getUserName(userId: string) {
+        console.log(userId);
+        const foundUser = this.props.users.find((user) => user._id == userId);
+        return foundUser != null ? foundUser.displayName : 'N/A';
     }
 
     @autobind
@@ -80,9 +82,14 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
     }
 
     render() {
+        const initial = { ...this.props.event };
+        if(this.props.mode == 'create') {
+            initial.userId = (firebase.auth().currentUser as firebase.User).uid
+        }
+
         return (
             <Formik
-                initialValues={{ ...this.props.event }}
+                initialValues={initial}
                 isInitialValid={this.props.mode == 'edit'}
                 onSubmit={async (values, actions) => {
                     actions.setSubmitting(true);
@@ -147,8 +154,14 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                             </SemanticForm.Field>
                         </SemanticForm.Group>
                         
-                        <SemanticForm.Input disabled={true} label='Host' error={formikBag.errors.userId != null} placeholder='Name des Users' name='host' value={this.getUser(formikBag.values.userId).displayName}/>
 
+                        {
+                            this.props.userDetails.role == 'Verwaltung' || this.props.userDetails.role == 'Hauswart' || formikBag.values.userId == (firebase.auth().currentUser as firebase.User).uid?
+                            <SemanticForm.Input disabled={true} label='Host' error={formikBag.errors.userId != null} placeholder='Name des Users' name='host' value={this.getUserName(formikBag.values.userId)}/>
+                            :
+                                null
+                        }
+                 
                         {
                             this.canEdit() ?
                             <div>
