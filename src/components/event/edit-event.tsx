@@ -102,16 +102,16 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                     actions.setSubmitting(false);
                 }}
                 validate={(values) => {
-                    const { name, roomId, description, startDate, endDate } = values;
+                    const { name, description, roomId, startDate, endDate } = values;
                     let errors: FormikErrors<EditEvent> = {};
                     if(name.length < 2) {
                         errors.name = 'Der Name muss mindestends 2 Zeichen lang sein'
                     }
+                    if(!description) {
+                        errors.description = 'Bitte füge eine Beschreibung hinzu!';
+                    }
                     if(!roomId || roomId.length < 5) {
                         errors.roomId = 'Bitte wähle einen Raum';
-                    }
-                    if(!description) {
-                        errors.roomId = 'Bitte füge eine Beschreibung hinzu!';
                     }
                     if(!startDate) {
                         errors.startDate = 'Bitte wähle ein Start Datum'
