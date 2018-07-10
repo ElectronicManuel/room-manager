@@ -1,24 +1,29 @@
 import * as React from 'react'
 import RoomListComponent from './components/room/room-list';
-import EventListComponent from './components/event/event-list';
+import EventOverview from './components/event/event-overview';
 
 import { firestore } from './firebase';
-import { Container, Header } from 'semantic-ui-react';
+import { Container, Message } from 'semantic-ui-react';
+import UserListComponent from './components/users/user-list';
+import { Switch, Route } from 'react-router';
 
 type AppProps = {
     userDetails: RoomManager.User
 }
 
 type AppState = {
+    rooms: RoomManager.Room[],
+    events: RoomManager.Event[],
+    users: RoomManager.UserWithId[],
     roomsLoading: boolean,
     eventsLoading: boolean,
-    rooms: RoomManager.Room[],
-    events: RoomManager.Event[]
+    usersLoading: boolean
 }
 
 export default class App extends React.Component<AppProps, AppState> {
-    cancelRoomsListener: Function
-    cancelEventsListener: Function
+    cancelRoomsListener: () => any
+    cancelEventsListener: () => any
+    cancelUsersListener: () => any
 
     constructor(props: any) {
         super(props);
@@ -26,8 +31,10 @@ export default class App extends React.Component<AppProps, AppState> {
         this.state = {
             rooms: [],
             events: [],
+            users: [],
             roomsLoading: true,
-            eventsLoading: true
+            eventsLoading: true,
+            usersLoading: true
         }
     }
 
@@ -47,33 +54,52 @@ export default class App extends React.Component<AppProps, AppState> {
             });
             this.setState({events, eventsLoading: false});
         });
+
+        this.cancelUsersListener = firestore.collection('users').onSnapshot(snapshot => {
+            const users: RoomManager.UserWithId[] = [];
+            snapshot.docs.forEach(user => {
+                users.push(({...user.data(), _id: user.id} as RoomManager.UserWithId));
+            });
+            this.setState({users, usersLoading: false});
+        });
     }
 
     componentWillUnmount() {
         if(this.cancelRoomsListener) this.cancelRoomsListener();
         if(this.cancelEventsListener) this.cancelEventsListener();
+        if(this.cancelUsersListener) this.cancelUsersListener();
     }
 
     public render() {
         return (
             <Container>
-                <Header as='h2'>
-                Übersicht
-                </Header>
-                
-                <Header as='h2'>
-                    Events
-                </Header>
-                <EventListComponent loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} userDetails={this.props.userDetails} />
-
-                {this.props.userDetails.role == 'Verwaltung' ? 
-                    <div>
-                        <Header as='h2'>
-                            Räume
-                        </Header>
-                        <RoomListComponent loading={this.state.roomsLoading} rooms={this.state.rooms} setLoading={(loading: boolean) => {this.setState({roomsLoading: loading})}} />
-                    </div>
-                : null}
+                <Switch>
+                    <Route path='/users' render={() => {
+                        if(this.props.userDetails.role === 'Verwaltung') {
+                            return <UserListComponent loading={this.state.usersLoading} users={this.state.users} setLoading={(loading: boolean) => {this.setState({usersLoading: loading})}} />;
+                        } else {
+                            return <Message error>Du darfst diese Seite nicht ansehen.</Message>
+                        }
+                    }} />
+                    <Route path='/rooms' render={() => {
+                        if(this.props.userDetails.role === 'Verwaltung') {
+                            return <RoomListComponent loading={this.state.roomsLoading} rooms={this.state.rooms} setLoading={(loading: boolean) => {this.setState({roomsLoading: loading})}} />
+                        } else {
+                            return <Message error>Du darfst diese Seite nicht ansehen.</Message>
+                        }
+                    }} />
+                    <Route path='/events' render={() => {
+                        if(this.props.userDetails.role === 'Verwaltung' || this.props.userDetails.role === 'Hauswart') {
+                            return <EventOverview mode='list' loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} userDetails={this.props.userDetails} users={this.state.users} /> 
+                        } else {
+                            return <Message error>Du darfst diese Seite nicht ansehen.</Message>
+                        }
+                    }} />
+                    <Route path='/' render={() => (
+                        <EventOverview mode='overview' loading={this.state.eventsLoading} events={this.state.events} setLoading={(loading: boolean) => {this.setState({eventsLoading: loading})}} rooms={this.state.rooms} userDetails={this.props.userDetails} users={this.state.users} />                     
+                    )} />
+                     
+                </Switch>
             </Container>
             
         )

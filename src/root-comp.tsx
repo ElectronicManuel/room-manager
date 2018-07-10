@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { Switch, Route, BrowserRouter as Router, withRouter } from 'react-router-dom';
+import { Switch, Route, BrowserRouter as Router, withRouter, Link } from 'react-router-dom';
 import LoginComp from './components/auth/login';
 import RequestSignIn from './components/auth/request-signin';
 import App from './app';
 
 import { firebase, firestore } from './firebase';
-import { Loader, Header, Container, Segment, Button, Grid } from 'semantic-ui-react';
+import { Loader, Header, Container, Segment, Button, Grid, Menu } from 'semantic-ui-react';
 
 import 'semantic-ui-css/semantic.min.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -74,6 +74,44 @@ const RootComponent = withRouter(class Root extends React.Component<RouterProps,
         });
     }
 
+    getMenuItems() {
+        const menuItems = [
+            <Link to='/' key={1}>
+                <Menu.Item name='Home' active={this.props.history.location.pathname == '/'} />
+            </Link>
+        ];
+        
+        if(this.state.userDetails) {
+            if(this.state.userDetails.role === 'Hauswart' || this.state.userDetails.role === 'Verwaltung') {
+                menuItems.push(
+                    <Link to='/events' key={2}>
+                        <Menu.Item name='Events' active={this.props.history.location.pathname == '/events'} />
+                    </Link>
+                );
+            }
+            if(this.state.userDetails.role == 'Verwaltung') {
+                menuItems.push(
+                    <Link to='/rooms' key={3}>
+                        <Menu.Item name='Raum' active={this.props.history.location.pathname == '/rooms'} />
+                    </Link>
+                );
+                menuItems.push(
+                    <Link to='/users' key={4}>
+                        <Menu.Item name='Benutzer' active={this.props.history.location.pathname == '/users'} />
+                    </Link>
+                );
+            }
+        } else {
+            menuItems.push(
+                <Link to='/login' key={2}>
+                    <Menu.Item name='Anmelden' active={this.props.history.location.pathname == '/login'} />
+                </Link>
+            );
+        }
+
+        return menuItems;
+    }
+
     render() {
         let mainComponent: any;
         
@@ -103,6 +141,13 @@ const RootComponent = withRouter(class Root extends React.Component<RouterProps,
                             </Grid.Column>
                             <Grid.Column>
                                 {topBarButton}
+                            </Grid.Column>
+                        </Grid.Row>
+                        <Grid.Row>
+                            <Grid.Column>
+                                <Menu stackable>
+                                    {this.getMenuItems()}
+                                </Menu>
                             </Grid.Column>
                         </Grid.Row>
                     </Grid>

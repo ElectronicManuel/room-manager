@@ -20,7 +20,8 @@ declare namespace RoomManager {
         roomId: string,
         description: string,
         startDate?: number,
-        endDate?: number
+        endDate?: number,
+        userId: string
     }
 
     type Event = EventInCreation & HasId;
@@ -28,9 +29,13 @@ declare namespace RoomManager {
     type Role = 'User' | 'Verwaltung' | 'Hauswart';
 
     interface User {
+        _id?: string,
         role: Role,
-        displayName: string
+        displayName: string,
+        photo?: string
     }
+
+    type UserWithId = User & HasId;
 }
 
 declare module 'react-firebaseui';
