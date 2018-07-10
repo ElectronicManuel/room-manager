@@ -98,6 +98,7 @@ export default class EditRoomComp extends React.Component<EditRoomProps, any> {
                     if(name.length < 2) {
                         errors.name = 'Der Name muss mindestends 2 Zeichen lang sein'
                     }
+                    console.log('color: ', color);
                     if(!color) {
                         errors.color = 'Du musst eine Farbe auswählen';
                     }

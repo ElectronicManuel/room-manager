@@ -17,3 +17,7 @@ hidden {
 .ui.form .disabled.field, .ui.form .disabled.fields .field, .ui.form .field :disabled {
     opacity: 1 !important;
 }
+
+.ui.form .disabled.field, .ui.form .disabled.fields .field, .ui.form .field :disabled button {
+    opacity: .45 !important;
+}
