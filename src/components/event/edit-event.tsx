@@ -132,7 +132,13 @@ export default class EditEventComp extends React.Component<EditEventProps, EditE
                 onSubmit={async (values, actions) => {
                     actions.setSubmitting(true);
                     const { name, roomId, description, startDate, endDate } = values;
-                    const userId = (firebase.auth().currentUser as firebase.User).uid;
+                    let  userId;
+                    if(this.props.mode == 'create'){
+                        userId = (firebase.auth().currentUser as firebase.User).uid;
+                    }
+                    else{
+                        userId = values.userId;
+                    }
                     
                     const editEvent = {
                         name,
