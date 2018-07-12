@@ -6,7 +6,7 @@ class RequestSignInComponent extends React.Component<RouteComponentProps<any, an
     render() {
         return (
             <Container>
-                <Message error>Du musst angemeldet sein um diese Seite zu sehen</Message>
+                <Message error>Du musst angemeldet sein um diese Seite zu sehen!</Message>
                 <Button floated='left' primary onClick={() => {this.props.history.push('/login')}}>Anmelden</Button>
             </Container>
         );
